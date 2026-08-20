@@ -1,0 +1,830 @@
+.spark {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  width: 48px;
+  height: 42px;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+.spark:hover,
+.spark:focus-visible {
+  background: #e7eee8;
+  box-shadow: 0 0 0 1px var(--green);
+}
+.scope-controls .center-map {
+  border-left: 1px solid #b9c1ba;
+  border-radius: 0 18px 18px 0;
+  margin-left: 3px;
+  padding-left: 12px;
+}
+.scope-controls .center-map:hover {
+  background: #dfe7df;
+  color: var(--green);
+}
+.source-badges {
+  flex-wrap: wrap;
+  max-width: 680px;
+  gap: 8px;
+}
+.source-badges span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 31px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 253, 247, 0.66);
+  color: var(--ink);
+  font: 9px/1 DM Mono;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.inline-spark{display:inline-grid;place-items:center;width:25px;height:25px;padding:0;border:1px solid rgba(23,91,78,.35);border-radius:50%;background:#fffdf7;color:var(--green);font-size:15px;line-height:1;vertical-align:-3px;cursor:pointer}.inline-spark:hover,.inline-spark:focus-visible{background:var(--green);color:white}.translate-coordinates{width:100%;margin-top:18px;padding:11px 14px;border:1px solid var(--green);background:transparent;color:var(--green);font:10px DM Mono;letter-spacing:.35px;cursor:pointer}.translate-coordinates:hover{background:#edf3ee}.translate-coordinates:disabled{opacity:.45;cursor:default}
+.atlas-app {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.atlas-app .topbar {
+  height: 62px;
+  flex: 0 0 62px;
+}
+.atlas-app .atlas {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.atlas-app .atlas-head {
+  flex: 0 0 auto;
+  padding: 16px 3vw 13px;
+}
+.atlas-app .atlas-head h1 {
+  font-size: 38px;
+  margin: 5px 0 2px;
+}
+.atlas-app .atlas-head p {
+  font-size: 12px;
+}
+.atlas-app footer {
+  height: 28px;
+  flex: 0 0 28px;
+}
+.atlas-app .workspace {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+.atlas-tools {
+  height: 48px;
+  flex: 0 0 48px;
+  padding: 6px 3vw;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: #faf8f1;
+}
+.atlas-tools .search {
+  width: min(390px, 35vw);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 7px 14px;
+  display: flex;
+  gap: 8px;
+}
+.atlas-tools input {
+  border: 0;
+  background: none;
+  outline: 0;
+  width: 100%;
+  font-size: 11px;
+}
+.atlas-tools > span {
+  margin-left: auto;
+  font: 9px DM Mono;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.atlas-tools > button {
+  border: 0;
+  background: none;
+  font: 9px DM Mono;
+  color: var(--green);
+  cursor: pointer;
+}
+.counts button {
+  border: 0;
+  background: none;
+  text-align: left;
+  padding: 5px 12px;
+  border-left: 1px solid var(--line);
+  font: 9px DM Mono;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.counts button:hover {
+  background: #e8ebe2;
+}
+.counts button b {
+  font: 22px Newsreader;
+  color: var(--green);
+  display: block;
+}
+.scope-controls {
+  position: absolute;
+  z-index: 5;
+  top: 18px;
+  right: 20px;
+  background: rgba(243, 240, 232, 0.94);
+  padding: 4px;
+  border-radius: 24px;
+}
+.scope-controls button {
+  border: 0;
+  background: transparent;
+  padding: 8px 12px;
+  border-radius: 18px;
+  font: 9px DM Mono;
+  cursor: pointer;
+}
+.scope-controls button.active {
+  background: var(--green);
+  color: white;
+}
+.view-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.section-title h2 {
+  font: 46px/1 Newsreader;
+  margin: 10px 0;
+}
+.section-title > p {
+  font: 13px Manrope;
+  color: var(--muted);
+}
+.timeline-view,
+.cards-view,
+.relations-view {
+  padding: 34px 4vw;
+}
+.timeline-list {
+  margin-top: 25px;
+  position: relative;
+}
+.timeline-list:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 65px;
+  width: 1px;
+  background: var(--line);
+}
+.timeline-list a {
+  display: grid;
+  grid-template-columns: 65px 1fr;
+  gap: 22px;
+  text-decoration: none;
+  color: var(--ink);
+  padding: 12px 0;
+}
+.timeline-list a > b {
+  font: 14px DM Mono;
+  color: var(--green);
+}
+.timeline-list a > span {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+}
+.timeline-list strong {
+  display: block;
+  font: 17px Newsreader;
+}
+.timeline-list small {
+  font: 9px DM Mono;
+  color: var(--muted);
+}
+.concept-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 24px;
+}
+.concept-grid button {
+  border: 0;
+  background: #faf8f1;
+  text-align: left;
+  padding: 22px;
+  min-height: 140px;
+  cursor: pointer;
+}
+.concept-grid button:hover {
+  background: #e9eee7;
+}
+.concept-grid small {
+  font: 8px DM Mono;
+  color: var(--green);
+}
+.concept-grid h3 {
+  font: 23px/1 Newsreader;
+  text-transform: capitalize;
+  margin: 18px 0;
+}
+.concept-grid span {
+  font: 9px DM Mono;
+  color: var(--muted);
+}
+.author-list {
+  margin-top: 24px;
+  columns: 2;
+  column-gap: 40px;
+}
+.author-list button {
+  width: 100%;
+  break-inside: avoid;
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  text-align: left;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: none;
+  padding: 13px 0;
+  cursor: pointer;
+}
+.author-list button > span,
+.author-list button > small {
+  font: 9px DM Mono;
+  color: var(--green);
+}
+.author-list strong {
+  font: 16px Newsreader;
+}
+.relation-list {
+  margin-top: 25px;
+}
+.relation-list article {
+  display: grid;
+  grid-template-columns: 42px 1fr 100px 1fr 100px;
+  gap: 14px;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding: 13px 0;
+}
+.relation-list article > span,
+.relation-list i,
+.relation-list b {
+  font: 9px DM Mono;
+  color: var(--muted);
+}
+.relation-list strong {
+  font: 17px Newsreader;
+  text-transform: capitalize;
+}
+.relation-list i {
+  text-align: center;
+}
+.relation-list b {
+  text-align: right;
+  color: var(--green);
+}
+.author-list > article {
+  width: 100%;
+  break-inside: avoid;
+  position: relative;
+  border-top: 1px solid var(--line);
+  padding: 8px 0;
+}
+.author-list .author-main {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 52px 36px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+.author-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--green);
+  color: white;
+  display: grid;
+  place-items: center;
+  font: 13px DM Mono;
+}
+.author-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.author-number,
+.author-main small {
+  font: 8px DM Mono;
+  color: var(--green);
+}
+.author-main strong {
+  font: 16px Newsreader;
+}
+.photo-credit {
+  display: block;
+  margin-left: 96px;
+  margin-top: -9px;
+  width: max-content;
+  font: 7px DM Mono;
+  color: var(--muted);
+  text-decoration: none;
+}
+.photo-credit:hover {
+  color: var(--green);
+}
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 17, 15, 0.68);
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.guide-modal {
+  width: min(700px, 96vw);
+  max-height: 92vh;
+  overflow: auto;
+  background: #fffdf7;
+  border: 1px solid #aeb8b2;
+  box-shadow: 18px 18px 0 rgba(0, 0, 0, 0.18);
+  padding: 38px;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  border: 0;
+  background: none;
+  font-size: 30px;
+  cursor: pointer;
+}
+.guide-modal h2 {
+  font: 44px/1 Newsreader;
+  margin: 15px 0;
+}
+.guide-modal > p {
+  font: 14px/1.6 Manrope;
+  color: var(--muted);
+  max-width: 560px;
+}
+.guide-modal textarea {
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  font: 18px/1.45 Newsreader;
+  outline: none;
+}
+.guide-action,
+.proposal > button {
+  width: 100%;
+  border: 0;
+  background: var(--green);
+  color: white;
+  padding: 14px;
+  margin-top: 12px;
+  cursor: pointer;
+}
+.guide-action:disabled {
+  opacity: 0.45;
+}
+.proposal {
+  margin-top: 20px;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+.proposal label {
+  display: block;
+  margin-top: 13px;
+}
+.proposal label span {
+  display: block;
+  font: 8px DM Mono;
+  color: var(--green);
+  letter-spacing: 1px;
+}
+.proposal input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 8px 0;
+  font: 18px Newsreader;
+  outline: 0;
+}
+@media (max-width: 1100px) {
+  .topbar nav {
+    overflow-x: auto;
+  }
+  .topbar nav button {
+    white-space: nowrap;
+  }
+  .verified {
+    display: none;
+  }
+  .concept-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .workspace {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+  .atlas-tools > span {
+    display: none;
+  }
+}
+@media (max-width: 900px) {
+  .atlas-app {
+    height: auto;
+    overflow: auto;
+  }
+  .atlas-app .workspace {
+    height: auto;
+  }
+  .atlas-app .counts {
+    display: flex;
+  }
+  .concept-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .relation-list article {
+    grid-template-columns: 35px 1fr 80px 1fr;
+  }
+  .relation-list b {
+    display: none;
+  }
+}
+@media (max-width: 560px) {
+  .brand b {
+    display: none;
+  }
+  .atlas-head {
+    display: block;
+  }
+  .counts {
+    margin-top: 12px;
+  }
+  .counts button {
+    padding: 4px 7px;
+  }
+  .counts button b {
+    font-size: 17px;
+  }
+  .atlas-tools {
+    padding: 6px 12px;
+  }
+  .atlas-tools .search {
+    width: 100%;
+  }
+  .atlas-tools > button {
+    display: none;
+  }
+  .references,
+  .method,
+  .timeline-view,
+  .cards-view,
+  .relations-view {
+    padding: 35px 20px;
+  }
+  .concept-grid {
+    grid-template-columns: 1fr;
+  }
+  .author-list {
+    columns: 1;
+  }
+  .relation-list article {
+    grid-template-columns: 30px 1fr 1fr;
+  }
+  .relation-list i {
+    display: none;
+  }
+  .guide-modal {
+    padding: 30px 22px;
+  }
+  .guide-modal h2 {
+    font-size: 36px;
+  }
+}
+
+/* A abertura ocupa exatamente uma tela em computadores */
+@media (min-width: 901px) {
+  main:not(.atlas-app) {
+    height: 100vh;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: 76px minmax(0, 1fr) 94px;
+  }
+  main:not(.atlas-app) .topbar {
+    position: relative;
+    height: 76px;
+  }
+  main:not(.atlas-app) .setup {
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+  main:not(.atlas-app) .site-footer {
+    height: 94px;
+    min-height: 94px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  main:not(.atlas-app) .setup-copy {
+    padding: clamp(20px, 3vh, 34px) 5vw;
+  }
+  main:not(.atlas-app) .setup h1 {
+    margin: 42px 0 48px;
+    font-size: clamp(46px, 5.2vw, 76px);
+    line-height: 0.98;
+  }
+  main:not(.atlas-app) .setup-copy > p {
+    font-size: 16px;
+    line-height: 1.65;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  main:not(.atlas-app) .source-badges {
+    margin-top: 54px;
+  }
+  main:not(.atlas-app) .composer {
+    padding: 18px 30px;
+  }
+  main:not(.atlas-app) .card-head {
+    padding-bottom: 10px;
+  }
+  main:not(.atlas-app) .composer label {
+    margin-top: 11px;
+  }
+  main:not(.atlas-app) .composer input {
+    padding: 7px 2px 6px;
+    font-size: 18px;
+  }
+  main:not(.atlas-app) .translate-coordinates {
+    margin-top: 11px;
+    padding: 9px 12px;
+  }
+  main:not(.atlas-app) .generate {
+    margin-top: 11px;
+    padding: 13px 18px;
+  }
+  main:not(.atlas-app) .inovalab-logo img {
+    width: 145px;
+  }
+  main:not(.atlas-app) .ifsc-logo img {
+    width: 170px;
+  }
+}
+
+/* Identidade, explicação do nome e rodapé institucional */
+.brand{position:relative}.name-tooltip{position:absolute;left:0;top:52px;width:min(460px,80vw);padding:13px 15px;border:1px solid #aeb8b2;border-radius:5px;background:#fffdf7;color:var(--ink);box-shadow:0 10px 28px rgba(24,37,34,.16);font:11px/1.55 Manrope;text-transform:none;letter-spacing:0;text-align:left;opacity:0;visibility:hidden;transform:translateY(-5px);transition:.16s;pointer-events:none;z-index:40}.name-tooltip:before{content:"";position:absolute;top:-6px;left:20px;width:10px;height:10px;background:#fffdf7;border-left:1px solid #aeb8b2;border-top:1px solid #aeb8b2;transform:rotate(45deg)}.brand:hover .name-tooltip,.brand:focus-visible .name-tooltip{opacity:1;visibility:visible;transform:translateY(0)}
+.inline-spark{display:inline;color:var(--green);font:600 1em Newsreader;vertical-align:baseline;white-space:nowrap;border:0;background:none;padding:0;cursor:default}
+.site-footer{width:100%;grid-template-columns:240px minmax(0,1fr) 240px;background:#27342f;color:#f3f0e8;padding-left:4vw;padding-right:4vw}.footer-copy{max-width:780px}.footer-copy a{color:#d4e478;border-bottom-color:rgba(212,228,120,.45)}.inovalab-logo,.ifsc-logo{width:220px;height:64px;padding:5px 9px;background:#f6f4ee;border:1px solid rgba(255,255,255,.35);border-radius:5px;display:flex;align-items:center}.inovalab-logo{justify-self:start}.ifsc-logo{justify-self:end}.inovalab-logo img,.ifsc-logo img{width:auto!important;height:auto;max-width:100%;max-height:52px;object-fit:contain;filter:none}.atlas-app .site-footer{grid-template-columns:190px minmax(0,1fr) 190px}.atlas-app .inovalab-logo,.atlas-app .ifsc-logo{width:176px;height:54px;padding:4px 8px}.atlas-app .inovalab-logo img,.atlas-app .ifsc-logo img{max-height:44px}@media(max-width:900px){.site-footer,.atlas-app .site-footer{grid-template-columns:130px minmax(0,1fr) 130px}.inovalab-logo,.ifsc-logo,.atlas-app .inovalab-logo,.atlas-app .ifsc-logo{width:122px;height:54px}.inovalab-logo img,.ifsc-logo img,.atlas-app .inovalab-logo img,.atlas-app .ifsc-logo img{max-height:42px}}@media(max-width:560px){.site-footer,.atlas-app .site-footer{grid-template-columns:86px minmax(0,1fr) 86px}.inovalab-logo,.ifsc-logo,.atlas-app .inovalab-logo,.atlas-app .ifsc-logo{width:82px;height:48px;padding:3px}.inovalab-logo img,.ifsc-logo img,.atlas-app .inovalab-logo img,.atlas-app .ifsc-logo img{max-height:40px}.name-tooltip{left:-8px;width:min(360px,90vw)}}
+
+/* Rodapé institucional INOVALAB */
+.site-footer {
+  min-height: 106px;
+  height: auto;
+  background: #ebe7dc;
+  color: var(--ink);
+  padding: 14px 4vw;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  align-items: center;
+  gap: 34px;
+  border-top: 1px solid var(--line);
+  font: 10px/1.55 Manrope;
+  letter-spacing: 0;
+}
+.inovalab-logo {
+  display: flex;
+  justify-content: flex-end;
+  grid-column: 2;
+  grid-row: 1;
+}
+.inovalab-logo img {
+  display: block;
+  width: 180px;
+  height: auto;
+}
+.footer-copy {
+  grid-column: 1;
+  grid-row: 1;
+  max-width: 900px;
+}
+.footer-copy p {
+  margin: 4px 0;
+}
+.footer-copy p:first-child {
+  font-size: 11px;
+}
+.footer-copy a {
+  color: var(--green);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(23, 91, 78, 0.35);
+}
+.footer-copy a:hover {
+  border-bottom-color: var(--green);
+}
+.atlas-app .site-footer {
+  min-height: 76px;
+  height: 76px;
+  flex: 0 0 76px;
+  padding: 7px 3vw;
+  grid-template-columns: minmax(0, 1fr) 135px;
+  gap: 20px;
+}
+.atlas-app .inovalab-logo img {
+  width: 128px;
+}
+.atlas-app .footer-copy {
+  font-size: 8px;
+  line-height: 1.35;
+}
+.atlas-app .footer-copy p:first-child {
+  font-size: 8px;
+}
+@media (max-width: 560px) {
+  .site-footer {
+    min-height: 120px;
+    padding: 12px 18px;
+    grid-template-columns: 1fr 105px;
+    gap: 12px;
+  }
+  .inovalab-logo img {
+    width: 102px;
+  }
+  .footer-copy,
+  .footer-copy p:first-child {
+    font-size: 8px;
+  }
+  .atlas-app .site-footer {
+    height: 88px;
+    flex-basis: 88px;
+    grid-template-columns: 1fr 90px;
+  }
+  .atlas-app .inovalab-logo img {
+    width: 86px;
+  }
+  .atlas-app .footer-copy,
+  .atlas-app .footer-copy p:first-child {
+    font-size: 7px;
+  }
+}
+
+/* Rodapé sem rolagem extra, com as duas instituições e texto centralizado */
+.setup {
+  min-height: calc(100vh - 182px);
+}
+.site-footer {
+  grid-template-columns: 180px minmax(320px, 760px) 210px;
+  justify-content: center;
+  text-align: center;
+  gap: 28px;
+}
+.inovalab-logo {
+  grid-column: 1;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 10px;
+  background: #fff;
+  border: 1px solid #d2d0c7;
+  border-radius: 6px;
+}
+.inovalab-logo img{filter:contrast(1.9) brightness(.72)}
+.footer-copy {
+  grid-column: 2;
+  justify-self: center;
+}
+.ifsc-logo {
+  grid-column: 3;
+  grid-row: 1;
+  display: flex;
+  justify-content: center;
+}
+.ifsc-logo img {
+  display: block;
+  width: 205px;
+  height: auto;
+}
+.atlas-app .site-footer {
+  grid-template-columns: 125px minmax(280px, 680px) 150px;
+  justify-content: center;
+}
+.atlas-app .ifsc-logo img {
+  width: 145px;
+}
+@media (max-width: 900px) {
+  .setup {
+    min-height: auto;
+  }
+  .site-footer {
+    grid-template-columns: 120px 1fr 145px;
+    gap: 14px;
+  }
+  .inovalab-logo img {
+    width: 118px;
+  }
+  .ifsc-logo img {
+    width: 140px;
+  }
+}
+@media (max-width: 560px) {
+  .site-footer,
+  .atlas-app .site-footer {
+    height: auto;
+    min-height: 112px;
+    grid-template-columns: 82px 1fr 96px;
+    gap: 8px;
+  }
+  .atlas-app .site-footer {
+    flex-basis: 112px;
+  }
+  .inovalab-logo img,
+  .atlas-app .inovalab-logo img {
+    width: 80px;
+  }
+  .ifsc-logo img,
+  .atlas-app .ifsc-logo img {
+    width: 92px;
+  }
+}
+
+/* Ajustes finais do cabeçalho e rodapé — mantidos ao fim para prevalecer */
+.name-tooltip{width:min(520px,86vw);padding:16px 18px;font:11px/1.75 Manrope;letter-spacing:.05px}.name-tooltip b,.brand .name-tooltip b{display:inline;font:700 11px/1.75 Manrope;letter-spacing:.05px}
+.site-footer,.atlas-app .site-footer{width:100%;padding-left:18px;padding-right:18px;grid-template-columns:220px minmax(0,1fr) 220px;gap:20px;justify-content:stretch}.inovalab-logo,.ifsc-logo,.atlas-app .inovalab-logo,.atlas-app .ifsc-logo{width:auto;height:auto;padding:0;background:transparent;border:0;border-radius:0}.inovalab-logo,.atlas-app .inovalab-logo{grid-column:1;justify-self:start;justify-content:flex-start}.ifsc-logo,.atlas-app .ifsc-logo{grid-column:3;justify-self:end;justify-content:flex-end}.inovalab-logo img,.ifsc-logo img,.atlas-app .inovalab-logo img,.atlas-app .ifsc-logo img{display:block;width:auto!important;height:52px!important;max-width:210px;max-height:52px;object-fit:contain;filter:none}.footer-copy{grid-column:2;justify-self:center;text-align:center;max-width:820px}.footer-copy p{margin:2px 0}.atlas-app .footer-copy p{margin:1px 0}@media(max-width:900px){.site-footer,.atlas-app .site-footer{padding-left:10px;padding-right:10px;grid-template-columns:125px minmax(0,1fr) 125px;gap:9px}.inovalab-logo img,.ifsc-logo img,.atlas-app .inovalab-logo img,.atlas-app .ifsc-logo img{height:42px!important;max-width:120px;max-height:42px}}@media(max-width:560px){.site-footer,.atlas-app .site-footer{grid-template-columns:82px minmax(0,1fr) 82px;gap:5px}.inovalab-logo img,.ifsc-logo img,.atlas-app .inovalab-logo img,.atlas-app .ifsc-logo img{height:34px!important;max-width:78px;max-height:34px}.name-tooltip{line-height:1.7}.name-tooltip b,.brand .name-tooltip b{line-height:1.7}}
+
+/* Layout adaptativo: mantém os formulários acima dos grafismos e totalmente tocáveis. */
+.setup::before { pointer-events: none; }
+.composer { position: relative; z-index: 2; }
+.provider-result { padding-left: 12px; border-left: 3px solid #8aa79f; line-height: 1.55; }
+.provider-recovered { border-left-color: var(--green); }
+.provider-empty { border-left-color: #9aa09b; color: #59625e; }
+.provider-rate_limited, .provider-unavailable { border-left-color: #b77935; color: #85551f; }
+.provider-not_configured { border-left-color: #6f7780; color: #59616a; }
+
+@media (min-width: 561px) and (max-width: 900px) {
+  .setup { grid-template-columns: 1fr; overflow: visible; }
+  .setup-copy { padding: 48px 7vw 20px; }
+  .setup h1 { font-size: clamp(54px, 9vw, 76px); }
+  .composer { width: min(620px, 86vw); margin: 28px auto 70px; }
+  .setup::before { opacity: .55; z-index: 0; }
+  .graph3d { height: min(66vh, 620px); }
+}
+
+@media (max-width: 560px) {
+  html, body { width: 100%; overflow-x: hidden; }
+  .topbar { height: 64px; padding: 0 14px; gap: 8px; }
+  .mark { width: 38px; height: 38px; flex: 0 0 38px; }
+  .topbar nav { margin-left: auto; max-width: calc(100vw - 68px); overflow-x: auto; scrollbar-width: none; }
+  .topbar nav::-webkit-scrollbar { display: none; }
+  .topbar nav button { min-height: 42px; padding: 8px 10px; }
+
+  .setup { display: block; min-height: 0; overflow: visible; }
+  .setup::before { display: none; }
+  .setup-copy { padding: 38px 20px 22px; }
+  .setup h1 { margin: 25px 0 30px; font-size: clamp(43px, 13vw, 58px); line-height: .94; }
+  .setup-copy > p { font-size: 17px; line-height: 1.55; }
+  .source-badges { margin-top: 30px; gap: 7px; }
+  .source-badges span { min-height: 36px; padding: 9px 11px; }
+
+  .composer { width: calc(100% - 28px); margin: 18px auto 42px; padding: 24px 20px; box-shadow: 8px 8px 0 #d8d5ca; }
+  .card-head { align-items: center; }
+  .composer label { align-items: flex-start; }
+  .composer label > span { flex: 0 0 25px; }
+  .composer label small { line-height: 1.45; }
+  .composer input { position: relative; z-index: 3; min-height: 46px; font-size: 18px; touch-action: manipulation; }
+  .translate-coordinates, .generate { min-height: 50px; }
+
+  .atlas-head { padding: 24px 16px 18px; }
+  .atlas-head h1 { font-size: 38px; }
+  .counts { gap: 8px; flex-wrap: wrap; }
+  .atlas-tools { flex-wrap: wrap; }
+  .workspace { display: block; width: 100%; }
+  .graph3d { width: 100%; height: 62vh; min-height: 430px; }
+  .detail { width: 100%; max-height: none; }
+
+  .site-footer, .atlas-app .site-footer { height: auto; min-height: 0; padding: 18px 12px; grid-template-columns: 72px minmax(0, 1fr) 72px; align-items: center; }
+  .footer-copy { font-size: 7px; line-height: 1.45; }
+  .inovalab-logo img, .ifsc-logo img, .atlas-app .inovalab-logo img, .atlas-app .ifsc-logo img { max-width: 68px; height: 30px!important; }
+}
