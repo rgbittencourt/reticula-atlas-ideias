@@ -225,6 +225,7 @@ function AuthorRow({
 }
 
 export default function Home() {
+  const [showCover, setShowCover] = useState(true);
   const [theme, setTheme] = useState("");
   const [subject, setSubject] = useState("");
   const [discipline, setDiscipline] = useState("");
@@ -482,10 +483,55 @@ export default function Home() {
     setQuery("");
   }
 
+  if (showCover) return (
+    <main className="reticula-cover">
+      <section className="cover-story">
+        <div className="cover-institutions">
+          <img src="/ifsc-continente-logo.png" alt="IFSC Câmpus Florianópolis-Continente" />
+          <span />
+          <img src="/inovalab-logo-v2.png" alt="INOVALAB — Rede de Inovação e Tecnologia" />
+        </div>
+        <div className="cover-headline">
+          <p>ATLAS DE LITERATURA CIENTÍFICA</p>
+          <h1>Ideias ganham<br/><i>forma.</i></h1>
+          <h2>Relações ganham<br/>sentido.</h2>
+          <p className="cover-description">Transforme um tema de pesquisa em uma rede viva de conceitos, autores e evidências científicas verificáveis.</p>
+        </div>
+        <div className="cover-signature">
+          <span className="cover-r">R</span>
+          <div><strong>Retícula</strong><small>Conhecimento conectado, fonte por fonte.</small></div>
+        </div>
+      </section>
+
+      <section className="cover-entry">
+        <div className="cover-entry-wrap">
+          <div className="cover-app-icon" aria-hidden="true"><span>R</span><i>✦</i></div>
+          <p className="cover-entry-kicker">RETÍCULA</p>
+          <h2>Encontre o caminho<br/>entre as ideias.</h2>
+          <p className="cover-entry-copy">Informe tema, assunto e disciplina. O Retícula pesquisa bases acadêmicas, reúne as fontes e constrói seu atlas 3D.</p>
+          <button className="cover-start" onClick={() => setShowCover(false)}>
+            <span className="cover-start-symbol">◎</span>
+            <strong>Começar uma pesquisa</strong>
+            <span>→</span>
+          </button>
+          <p className="cover-open-note">Acesso aberto · sem cadastro · sem login</p>
+          <div className="cover-divider" />
+          <h3>O que você encontrará</h3>
+          <div className="cover-benefits">
+            <div><span>3D</span><p><strong>Mapa interativo</strong><small>Conceitos e autores conectados visualmente</small></p></div>
+            <div><span>08</span><p><strong>Pesquisa multibase</strong><small>Oito serviços acadêmicos consultados em paralelo</small></p></div>
+            <div><span>DOI</span><p><strong>Evidência rastreável</strong><small>Referências e links preservados para conferência</small></p></div>
+          </div>
+        </div>
+        <p className="cover-entry-foot">Plataforma experimental do INOVALAB · IFSC</p>
+      </section>
+    </main>
+  );
+
   return (
     <main className={atlas ? "atlas-app" : ""}>
       <header className="topbar">
-        <button className="brand" onClick={() => setAtlas(null)} aria-describedby="name-explanation">
+        <button className="brand" onClick={() => { setAtlas(null); setShowCover(true); }} aria-describedby="name-explanation">
           <span className="mark">R</span>
           <span>
             <b>Retícula</b>

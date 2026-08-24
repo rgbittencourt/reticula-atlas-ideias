@@ -19,8 +19,8 @@ test("renderiza a aplicação Retícula", async () => {
   const html = await response.text();
   assert.match(html, /<title>Retícula — Atlas de Literatura Científica<\/title>/i);
   assert.match(html, /Retícula/);
-  assert.match(html, /Tema central/);
-  assert.match(html, /Assunto/);
-  assert.match(html, /Disciplina/);
+  assert.match(html, /Ideias ganham/);
+  assert.match(html, /Começar uma pesquisa/);
+  assert.match(html, /sem cadastro · sem login/);
   assert.doesNotMatch(html, /Your site is taking shape|Building your site/);
 });
