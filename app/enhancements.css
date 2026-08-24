@@ -529,69 +529,69 @@
 
 /* A abertura ocupa exatamente uma tela em computadores */
 @media (min-width: 901px) {
-  main:not(.atlas-app) {
+  main:not(.atlas-app):not(.reticula-cover) {
     height: 100vh;
     overflow: hidden;
     display: grid;
     grid-template-rows: 76px minmax(0, 1fr) 94px;
   }
-  main:not(.atlas-app) .topbar {
+  main:not(.atlas-app):not(.reticula-cover) .topbar {
     position: relative;
     height: 76px;
   }
-  main:not(.atlas-app) .setup {
+  main:not(.atlas-app):not(.reticula-cover) .setup {
     min-height: 0;
     height: 100%;
     overflow: hidden;
   }
-  main:not(.atlas-app) .site-footer {
+  main:not(.atlas-app):not(.reticula-cover) .site-footer {
     height: 94px;
     min-height: 94px;
     padding-top: 8px;
     padding-bottom: 8px;
   }
-  main:not(.atlas-app) .setup-copy {
+  main:not(.atlas-app):not(.reticula-cover) .setup-copy {
     padding: clamp(20px, 3vh, 34px) 5vw;
   }
-  main:not(.atlas-app) .setup h1 {
+  main:not(.atlas-app):not(.reticula-cover) .setup h1 {
     margin: 42px 0 48px;
     font-size: clamp(46px, 5.2vw, 76px);
     line-height: 0.98;
   }
-  main:not(.atlas-app) .setup-copy > p {
+  main:not(.atlas-app):not(.reticula-cover) .setup-copy > p {
     font-size: 16px;
     line-height: 1.65;
     margin-top: 0;
     margin-bottom: 0;
   }
-  main:not(.atlas-app) .source-badges {
+  main:not(.atlas-app):not(.reticula-cover) .source-badges {
     margin-top: 54px;
   }
-  main:not(.atlas-app) .composer {
+  main:not(.atlas-app):not(.reticula-cover) .composer {
     padding: 18px 30px;
   }
-  main:not(.atlas-app) .card-head {
+  main:not(.atlas-app):not(.reticula-cover) .card-head {
     padding-bottom: 10px;
   }
-  main:not(.atlas-app) .composer label {
+  main:not(.atlas-app):not(.reticula-cover) .composer label {
     margin-top: 11px;
   }
-  main:not(.atlas-app) .composer input {
+  main:not(.atlas-app):not(.reticula-cover) .composer input {
     padding: 7px 2px 6px;
     font-size: 18px;
   }
-  main:not(.atlas-app) .translate-coordinates {
+  main:not(.atlas-app):not(.reticula-cover) .translate-coordinates {
     margin-top: 11px;
     padding: 9px 12px;
   }
-  main:not(.atlas-app) .generate {
+  main:not(.atlas-app):not(.reticula-cover) .generate {
     margin-top: 11px;
     padding: 13px 18px;
   }
-  main:not(.atlas-app) .inovalab-logo img {
+  main:not(.atlas-app):not(.reticula-cover) .inovalab-logo img {
     width: 145px;
   }
-  main:not(.atlas-app) .ifsc-logo img {
+  main:not(.atlas-app):not(.reticula-cover) .ifsc-logo img {
     width: 170px;
   }
 }
@@ -815,6 +815,7 @@
 .cover-divider{height:1px;background:#dcded7}.cover-entry-wrap>h3{margin:27px 0 20px;font:18px Newsreader;color:#243d36}
 .cover-benefits{display:grid;gap:17px}.cover-benefits>div{display:flex;align-items:center;gap:14px}.cover-benefits>div>span{width:44px;height:44px;flex:0 0 44px;border-radius:10px;background:#e7ecda;color:#426a5f;display:grid;place-items:center;font:700 9px DM Mono}.cover-benefits p{margin:0;display:grid;gap:4px}.cover-benefits strong{font-size:12px}.cover-benefits small{font-size:9px;color:#7e8883}
 .cover-entry-foot{position:absolute;bottom:26px;color:#89928e;font:8px DM Mono;letter-spacing:.7px}
+@media(min-width:901px){main.reticula-cover{height:100vh;min-height:100vh;overflow:hidden;grid-template-rows:minmax(0,1fr)}.cover-story,.cover-entry{height:100vh;min-height:0}}
 @media(max-width:900px){.reticula-cover{grid-template-columns:1fr}.cover-story{min-height:66vh;padding:42px 7vw}.cover-headline{padding:70px 0}.cover-headline h1,.cover-headline h2{font-size:clamp(52px,12vw,82px)}.cover-entry{padding:64px 8vw 92px}.cover-signature{margin-top:20px}}
 @media(max-width:520px){.cover-story{min-height:630px;padding:30px 24px}.cover-institutions{gap:12px}.cover-institutions img{max-width:125px;max-height:44px}.cover-institutions img:last-child{max-width:105px}.cover-headline{padding:62px 0}.cover-headline>p:first-child{font-size:8px;letter-spacing:2px}.cover-headline h1,.cover-headline h2{font-size:clamp(48px,15vw,66px);letter-spacing:-2px}.cover-description{font-size:13px;margin-top:28px}.cover-signature small{font-size:8px}.cover-entry{padding:55px 22px 88px}.cover-entry-wrap>h2{font-size:37px}.cover-entry-copy{font-size:13px}.cover-start{min-height:62px}}
 
