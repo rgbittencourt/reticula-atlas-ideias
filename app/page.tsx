@@ -540,7 +540,7 @@ export default function Home() {
     <main className={atlas ? "atlas-app" : ""}>
       <header className="topbar">
         <button className="brand" onClick={() => { setAtlas(null); setShowCover(true); }} aria-describedby="name-explanation">
-          <span className="mark">R</span>
+          <img className="mark" src="/favicon.png" alt="" aria-hidden="true" />
           <span>
             <b>Retícula</b>
             <small>atlas de literatura científica</small>
