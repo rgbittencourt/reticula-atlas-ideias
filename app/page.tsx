@@ -505,7 +505,9 @@ export default function Home() {
 
       <section className="cover-entry">
         <div className="cover-entry-wrap">
-          <div className="cover-app-icon" aria-hidden="true"><span>R</span><i>✦</i></div>
+          <div className="cover-app-icon" aria-hidden="true">
+            <img src="/favicon.png" alt="" />
+          </div>
           <p className="cover-entry-kicker">RETÍCULA</p>
           <h2>Encontre o caminho<br/>entre as ideias.</h2>
           <p className="cover-entry-copy">Informe tema, assunto e disciplina. O Retícula pesquisa bases acadêmicas, reúne as fontes e constrói seu atlas 3D.</p>

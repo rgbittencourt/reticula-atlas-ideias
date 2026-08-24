@@ -804,16 +804,16 @@
 .cover-signature div{display:grid;gap:3px}.cover-signature strong{font:20px Newsreader}.cover-signature small{color:#a9c0ba;font:9px DM Mono;letter-spacing:.8px}
 .cover-entry{position:relative;display:grid;place-items:center;padding:70px clamp(40px,7vw,120px);background:#fbfaf6}
 .cover-entry-wrap{width:min(520px,100%)}
-.cover-app-icon{width:66px;height:66px;border-radius:18px;background:#173f37;color:#d1df74;display:grid;place-items:center;position:relative;margin-bottom:32px;box-shadow:0 14px 34px #173f3726}
-.cover-app-icon span{font:34px Newsreader}.cover-app-icon i{position:absolute;right:-8px;top:-8px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#d1df74;color:#173f37;font:12px Newsreader}
-.cover-entry-kicker{font:700 10px DM Mono;letter-spacing:3px;color:#497c70;margin:0}
-.cover-entry-wrap>h2{font:500 clamp(36px,3.7vw,52px)/1.02 Newsreader;letter-spacing:-1px;margin:14px 0 18px;color:#19332d}
+.cover-app-icon{width:66px;height:66px;border-radius:18px;overflow:hidden;margin-bottom:32px;box-shadow:0 14px 34px #35251f26}
+.cover-app-icon img{display:block;width:100%;height:100%;object-fit:cover}
+.cover-entry-kicker{font:700 10px DM Mono;letter-spacing:3px;color:#7a5546;margin:0}
+.cover-entry-wrap>h2{font:500 clamp(36px,3.7vw,52px)/1.02 Newsreader;letter-spacing:-1px;margin:14px 0 18px;color:#3b2922}
 .cover-entry-copy{font:15px/1.7 Manrope;color:#69756f;margin:0 0 30px;max-width:500px}
-.cover-start{width:100%;min-height:66px;border:0;border-radius:9px;background:#173f37;color:#fff;display:grid;grid-template-columns:32px 1fr 32px;align-items:center;padding:0 20px;text-align:left;box-shadow:0 12px 24px #173f3724;transition:.18s}
-.cover-start:hover{background:#0e332c;transform:translateY(-2px);box-shadow:0 16px 30px #173f3730}.cover-start-symbol{font-size:24px;color:#d1df74}.cover-start strong{font-size:13px}.cover-start>span:last-child{text-align:right;font-size:20px}
+.cover-start{width:100%;min-height:66px;border:0;border-radius:9px;background:#563a2f;color:#fff;display:grid;grid-template-columns:32px 1fr 32px;align-items:center;padding:0 20px;text-align:left;box-shadow:0 12px 24px #35251f2b;transition:.18s}
+.cover-start:hover{background:#3d2922;transform:translateY(-2px);box-shadow:0 16px 30px #35251f38}.cover-start-symbol{font-size:24px;color:#d0b36f}.cover-start strong{font-size:13px}.cover-start>span:last-child{text-align:right;font-size:20px}
 .cover-open-note{text-align:center;margin:14px 0 32px;color:#6b7771;font:9px DM Mono;letter-spacing:.4px}
-.cover-divider{height:1px;background:#dcded7}.cover-entry-wrap>h3{margin:27px 0 20px;font:18px Newsreader;color:#243d36}
-.cover-benefits{display:grid;gap:17px}.cover-benefits>div{display:flex;align-items:center;gap:14px}.cover-benefits>div>span{width:44px;height:44px;flex:0 0 44px;border-radius:10px;background:#e7ecda;color:#426a5f;display:grid;place-items:center;font:700 9px DM Mono}.cover-benefits p{margin:0;display:grid;gap:4px}.cover-benefits strong{font-size:12px}.cover-benefits small{font-size:9px;color:#7e8883}
+.cover-divider{height:1px;background:#e0d8d1}.cover-entry-wrap>h3{margin:27px 0 20px;font:18px Newsreader;color:#49342b}
+.cover-benefits{display:grid;gap:17px}.cover-benefits>div{display:flex;align-items:center;gap:14px}.cover-benefits>div>span{width:44px;height:44px;flex:0 0 44px;border-radius:10px;background:#eee3d9;color:#704c3d;display:grid;place-items:center;font:700 9px DM Mono}.cover-benefits p{margin:0;display:grid;gap:4px}.cover-benefits strong{font-size:12px;color:#3f2c25}.cover-benefits small{font-size:9px;color:#877a73}
 .cover-entry-foot{position:absolute;bottom:26px;color:#89928e;font:8px DM Mono;letter-spacing:.7px}
 @media(min-width:901px){main.reticula-cover{height:100vh;min-height:100vh;overflow:hidden;grid-template-rows:minmax(0,1fr)}.cover-story,.cover-entry{height:100vh;min-height:0}}
 @media(max-width:900px){.reticula-cover{grid-template-columns:1fr}.cover-story{min-height:66vh;padding:42px 7vw}.cover-headline{padding:70px 0}.cover-headline h1,.cover-headline h2{font-size:clamp(52px,12vw,82px)}.cover-entry{padding:64px 8vw 92px}.cover-signature{margin-top:20px}}
