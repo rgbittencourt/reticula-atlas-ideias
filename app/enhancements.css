@@ -785,9 +785,9 @@
 
 /* Capa de entrada — inspirada na composição institucional do KeyNotesAI. */
 .reticula-cover{min-height:100vh;display:grid;grid-template-columns:1.06fr .94fr;background:#fff;color:var(--ink)}
-.cover-story{position:relative;overflow:hidden;background:#173f37;color:#fff;padding:clamp(38px,5.5vh,76px) clamp(40px,6vw,100px);display:flex;flex-direction:column}
+.cover-story{position:relative;overflow:hidden;background:#35251f;color:#fff;padding:clamp(38px,5.5vh,76px) clamp(40px,6vw,100px);display:flex;flex-direction:column}
 .cover-story:before{content:"";position:absolute;width:720px;height:720px;border:1px solid #ffffff12;border-radius:50%;right:-430px;bottom:-370px;box-shadow:0 0 0 88px #ffffff08,0 0 0 190px #ffffff04}
-.cover-story:after{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(180deg,transparent,#0c2e2860);pointer-events:none}
+.cover-story:after{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(180deg,transparent,#21140f80);pointer-events:none}
 .cover-institutions,.cover-headline,.cover-signature{position:relative;z-index:1}
 .cover-institutions{display:flex;align-items:center;gap:22px;height:74px}
 .cover-institutions img{width:auto;max-width:190px;max-height:58px;object-fit:contain;filter:brightness(0) invert(1)}
