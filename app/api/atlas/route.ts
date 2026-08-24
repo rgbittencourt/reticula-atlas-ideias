@@ -447,12 +447,17 @@ async function core(query: string): Promise<Work[]> {
 
 async function doaj(query: string): Promise<Work[]> {
   const safe = providerSafeQuery(query);
-  const r = await timedFetch(`https://doaj.org/api/search/articles/${encodeURIComponent(safe)}?pageSize=80`, {
-    headers: { "User-Agent": "ReticulaAtlas/2.0 (inovalab.cte@ifsc.edu.br)" },
-  });
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  const j: any = await r.json();
-  return (j.results || []).map((record: any) => {
+  const words = safe.split(/\s+/);
+  const middle = Math.max(1, Math.ceil(words.length / 2));
+  const candidates = [...new Set([safe, words.slice(0, middle).join(" "), words.slice(middle).join(" ")].filter(Boolean))];
+  const responses = await Promise.all(candidates.map((candidate) => timedFetch(
+    `https://doaj.org/api/search/articles/${encodeURIComponent(candidate)}?pageSize=40`,
+    { headers: { "User-Agent": "ReticulaAtlas/2.0 (inovalab.cte@ifsc.edu.br)" } },
+  )));
+  const failed = responses.find((r) => !r.ok);
+  if (failed) throw new Error(`HTTP ${failed.status}`);
+  const pages: any[] = await Promise.all(responses.map((r) => r.json()));
+  return pages.flatMap((j) => j.results || []).map((record: any) => {
     const p = record.bibjson || {};
     const doi = (p.identifier || []).find((x: any) => x.type === "doi")?.id || null;
     return {
@@ -468,15 +473,21 @@ async function doaj(query: string): Promise<Work[]> {
       source: "DOAJ",
       fields: [...(p.keywords || []), ...(p.subject || []).map((x: any) => x.term).filter(Boolean)],
     };
-  }).filter((p: Work) => p.title);
+  }).filter((p: Work) => p.title).slice(0, 80);
 }
 
 async function datacite(query: string): Promise<Work[]> {
   const safe = providerSafeQuery(query);
-  const r = await timedFetch(`https://api.datacite.org/dois?query=${encodeURIComponent(safe)}&page%5Bsize%5D=80`);
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  const j: any = await r.json();
-  return (j.data || []).map((record: any) => {
+  const words = safe.split(/\s+/);
+  const middle = Math.max(1, Math.ceil(words.length / 2));
+  const candidates = [...new Set([safe, words.slice(0, middle).join(" "), words.slice(middle).join(" ")].filter(Boolean))];
+  const responses = await Promise.all(candidates.map((candidate) => timedFetch(
+    `https://api.datacite.org/dois?query=${encodeURIComponent(candidate)}&page%5Bsize%5D=40`,
+  )));
+  const failed = responses.find((r) => !r.ok);
+  if (failed) throw new Error(`HTTP ${failed.status}`);
+  const pages: any[] = await Promise.all(responses.map((r) => r.json()));
+  return pages.flatMap((j) => j.data || []).map((record: any) => {
     const p = record.attributes || {};
     const doi = p.doi || record.id || null;
     return {
@@ -492,7 +503,7 @@ async function datacite(query: string): Promise<Work[]> {
       source: "DataCite",
       fields: (p.subjects || []).map((x: any) => x.subject).filter(Boolean),
     };
-  }).filter((p: Work) => p.title);
+  }).filter((p: Work) => p.title).slice(0, 80);
 }
 
 async function eric(query: string): Promise<Work[]> {
