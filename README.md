@@ -58,9 +58,10 @@ A tradução para inglês usa primeiro a OpenAI para preservar o significado cie
 
 ### Fontes brasileiras, latino-americanas e de acesso aberto
 
-- **Oasisbr / BDTD (IBICT):** produção de repositórios brasileiros, teses e dissertações. Os servidores recebem limite de tempo isolado para não atrasar as demais bases.
+- **Oasisbr / IBICT:** produção científica de repositórios brasileiros. O servidor recebe limite de tempo isolado para não atrasar as demais bases.
+- **BDTD / IBICT:** teses e dissertações brasileiras, consultadas e exibidas separadamente do Oasisbr.
 - **DOAJ:** artigos de periódicos de acesso aberto.
-- **CAPES Teses e Dissertações:** catálogo nacional identificado no painel. Como a CAPES distribui arquivos anuais, sua incorporação integral depende de uma rotina de indexação periódica, e não de uma consulta HTTP por pesquisa.
+- **CAPES Dados Abertos:** inclui o catálogo nacional de teses e dissertações. Como a CAPES distribui arquivos anuais, sua incorporação integral depende de uma rotina de indexação periódica, e não de uma consulta HTTP por pesquisa.
 - **ERIC:** ativado semanticamente para Educação, ensino, escola e aprendizagem.
 - **DataCite:** amplia a descoberta para teses, datasets, relatórios e outros objetos com DOI.
 - **LA Referencia:** repositórios científicos da América Latina.

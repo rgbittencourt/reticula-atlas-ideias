@@ -555,14 +555,8 @@ async function vuFindSearch(base: string, source: string, query: string): Promis
   }).filter((p: Work) => p.title);
 }
 
-const oasisBdtd = (query: string) => Promise.allSettled([
-  vuFindSearch("https://oasisbr.ibict.br", "Oasisbr", query),
-  vuFindSearch("https://bdtd.ibict.br", "BDTD", query),
-]).then((results) => {
-  const works = results.flatMap((r) => r.status === "fulfilled" ? r.value : []);
-  if (!works.length) throw new Error("IBICT não respondeu dentro do limite de tempo");
-  return works;
-});
+const oasisbr = (query: string) => vuFindSearch("https://oasisbr.ibict.br", "Oasisbr / IBICT", query);
+const bdtd = (query: string) => vuFindSearch("https://bdtd.ibict.br", "BDTD / IBICT", query);
 
 async function laReferencia(query: string): Promise<Work[]> {
   const phrases = [...query.matchAll(/"([^"]{3,80})"/g)].map((m) => m[1]);
@@ -738,9 +732,10 @@ async function handleGet(request: NextRequest) {
     { name: "Europe PMC / PubMed", limit: 100, search: europePmc, applicable: biomedical, reason: "prioriza literatura biomédica e de ciências da saúde" },
     { name: "arXiv", limit: 80, search: arxiv, applicable: technical, reason: "prioriza computação, física, matemática, engenharia e áreas quantitativas" },
     { name: "CORE", limit: 100, search: core },
-    { name: "Oasisbr / BDTD", limit: 120, search: oasisBdtd },
+    { name: "Oasisbr / IBICT", limit: 60, search: oasisbr },
+    { name: "BDTD / IBICT", limit: 60, search: bdtd },
     { name: "DOAJ", limit: 80, search: doaj },
-    { name: "CAPES Teses e Dissertações", limit: 0, search: async () => [], mode: "catalog_only", reason: "a CAPES publica conjuntos anuais; a busca exige indexação periódica própria" },
+    { name: "CAPES Dados Abertos", limit: 0, search: async () => [], mode: "catalog_only", reason: "inclui o Catálogo de Teses e Dissertações; a CAPES publica conjuntos anuais que exigem indexação periódica própria" },
     { name: "ERIC", limit: 80, search: eric, applicable: education, reason: "prioriza Educação, ensino e aprendizagem" },
     { name: "DataCite", limit: 80, search: datacite },
     { name: "LA Referencia", limit: 60, search: laReferencia },
@@ -753,7 +748,7 @@ async function handleGet(request: NextRequest) {
     return /[a-z0-9à-ÿ]{3}/i.test(safe) ? candidate : coordinateFallback;
   };
   const queryFor = (provider: string) => {
-    if (["Oasisbr / BDTD", "DOAJ", "DataCite"].includes(provider)) return discoveryQuery;
+    if (["Oasisbr / IBICT", "BDTD / IBICT", "DOAJ", "DataCite"].includes(provider)) return discoveryQuery;
     if (provider === "LA Referencia") return usableQuery(semanticPlan.queries.technical);
     if (provider === "SciELO") return usableQuery(semanticPlan.queries.portuguese);
     if (["arXiv", "ERIC"].includes(provider)) return usableQuery(semanticPlan.queries.technical);

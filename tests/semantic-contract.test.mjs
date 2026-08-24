@@ -23,9 +23,10 @@ test("adapta consultas e fontes ao domínio pesquisado", () => {
   assert.match(route, /not_applicable/);
   assert.match(route, /coordinateFallback/);
   assert.match(route, /usableQuery/);
-  assert.match(route, /Oasisbr \/ BDTD/);
+  assert.match(route, /Oasisbr \/ IBICT/);
+  assert.match(route, /BDTD \/ IBICT/);
   assert.match(route, /DOAJ/);
-  assert.match(route, /CAPES Teses e Dissertações/);
+  assert.match(route, /CAPES Dados Abertos/);
   assert.match(route, /applicable: education/);
   assert.match(route, /DataCite/);
   assert.match(route, /LA Referencia/);
