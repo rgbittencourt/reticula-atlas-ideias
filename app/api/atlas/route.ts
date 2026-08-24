@@ -17,11 +17,139 @@ type Work = {
 };
 type Provider = { name: string; limit: number; search: (query: string) => Promise<Work[]> };
 
+type SemanticPlan = {
+  coordinates: { theme: string; subject: string; discipline: string };
+  intent: string;
+  inclusionTerms: string[];
+  exclusionTerms: string[];
+  queries: {
+    general: string;
+    portuguese: string;
+    technical: string;
+    biomedical: string;
+  };
+  rationale: string;
+  source: "openai" | "deterministic";
+};
+
 const STOP = new Set(
   `a o as os um uma de da do das dos em no na nos nas para por com sem sobre entre e ou que como ao seu sua seus suas este esta isso ser ter sao mais menos estudo estudos analise research study studies analysis effect effects using based approach review systematic from into with without this that these those their our evidence results method methods data model models`.split(
     /\s+/,
   ),
 );
+
+const semanticPlanSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["coordinates", "intent", "inclusionTerms", "exclusionTerms", "queries", "rationale"],
+  properties: {
+    coordinates: {
+      type: "object",
+      additionalProperties: false,
+      required: ["theme", "subject", "discipline"],
+      properties: {
+        theme: { type: "string" },
+        subject: { type: "string" },
+        discipline: { type: "string" },
+      },
+    },
+    intent: { type: "string" },
+    inclusionTerms: { type: "array", items: { type: "string" } },
+    exclusionTerms: { type: "array", items: { type: "string" } },
+    queries: {
+      type: "object",
+      additionalProperties: false,
+      required: ["general", "portuguese", "technical", "biomedical"],
+      properties: {
+        general: { type: "string" },
+        portuguese: { type: "string" },
+        technical: { type: "string" },
+        biomedical: { type: "string" },
+      },
+    },
+    rationale: { type: "string" },
+  },
+} as const;
+
+function compactTerm(value: string) {
+  return value.replace(/[()]/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
+}
+
+function deterministicPlan(theme: string, subject: string, discipline: string): SemanticPlan {
+  const t = compactTerm(theme), s = compactTerm(subject), d = compactTerm(discipline);
+  const quoted = (value: string) => value.includes(" ") ? `"${value}"` : value;
+  const general = [quoted(t), quoted(s), quoted(d)].join(" AND ").slice(0, 280);
+  return {
+    coordinates: { theme: t, subject: s, discipline: d },
+    intent: `Investigar ${s} no domínio de ${t}, sob a perspectiva de ${d}.`,
+    inclusionTerms: [t, s, d],
+    exclusionTerms: [],
+    queries: { general, portuguese: general, technical: general, biomedical: general },
+    rationale: "Plano estruturado localmente a partir dos papéis declarados nas três coordenadas.",
+    source: "deterministic",
+  };
+}
+
+function responseText(data: any) {
+  if (typeof data?.output_text === "string") return data.output_text;
+  for (const item of data?.output || [])
+    for (const content of item?.content || [])
+      if (content?.type === "output_text" && typeof content.text === "string") return content.text;
+  return "";
+}
+
+async function buildSemanticPlan(theme: string, subject: string, discipline: string): Promise<SemanticPlan> {
+  const fallback = deterministicPlan(theme, subject, discipline);
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return fallback;
+  try {
+    const response = await timedFetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: process.env.OPENAI_SEMANTIC_MODEL || "gpt-5-mini",
+        store: false,
+        reasoning: { effort: "low" },
+        input: [
+          {
+            role: "system",
+            content: [{ type: "input_text", text: "Você é um bibliotecário científico. Interprete três coordenadas com papéis distintos: tema = objeto amplo; assunto = recorte, fenômeno, método ou problema; disciplina = campo e vocabulário científico. Normalize ambiguidades sem inventar especificidades. Gere consultas acadêmicas compactas, com sinônimos e operadores booleanos adequados. A consulta portuguese deve privilegiar português/variações lusófonas; technical deve servir arXiv/computação/engenharias; biomedical deve servir PubMed/Europe PMC. Responda no idioma predominante do usuário, exceto pelas consultas que podem usar inglês científico." }],
+          },
+          {
+            role: "user",
+            content: [{ type: "input_text", text: `Tema central: ${theme}\nAssunto: ${subject}\nDisciplina: ${discipline}` }],
+          },
+        ],
+        text: {
+          format: {
+            type: "json_schema",
+            name: "semantic_research_plan",
+            strict: true,
+            schema: semanticPlanSchema,
+          },
+        },
+        max_output_tokens: 1800,
+      }),
+    }, 20_000);
+    if (!response.ok) throw new Error(`OpenAI HTTP ${response.status}`);
+    const parsed = JSON.parse(responseText(await response.json()));
+    return {
+      ...parsed,
+      coordinates: {
+        theme: compactTerm(parsed.coordinates.theme || theme),
+        subject: compactTerm(parsed.coordinates.subject || subject),
+        discipline: compactTerm(parsed.coordinates.discipline || discipline),
+      },
+      inclusionTerms: (parsed.inclusionTerms || []).map(compactTerm).filter(Boolean).slice(0, 16),
+      exclusionTerms: (parsed.exclusionTerms || []).map(compactTerm).filter(Boolean).slice(0, 10),
+      queries: Object.fromEntries(Object.entries(parsed.queries).map(([k, v]) => [k, String(v).slice(0, 280)])),
+      source: "openai",
+    } as SemanticPlan;
+  } catch (error) {
+    console.warn("Semantic planner fallback:", error instanceof Error ? error.message : error);
+    return fallback;
+  }
+}
 const normalize = (value: unknown) =>
   String(value ?? "")
     .normalize("NFD")
@@ -328,7 +456,18 @@ function phrases(text: string) {
   }
   return [...new Set(out)];
 }
-function graph(works: Work[], theme: string) {
+function relevanceScore(work: Work, plan: SemanticPlan) {
+  const haystack = normalize(`${work.title} ${work.abstract || ""} ${work.fields.join(" ")}`);
+  const coordinateTerms = Object.values(plan.coordinates).flatMap(phrases);
+  const inclusionTerms = plan.inclusionTerms.flatMap(phrases);
+  let score = 0;
+  for (const term of new Set(coordinateTerms)) if (haystack.includes(term)) score += term.includes(" ") ? 4 : 2;
+  for (const term of new Set(inclusionTerms)) if (haystack.includes(term)) score += term.includes(" ") ? 3 : 1;
+  for (const term of plan.exclusionTerms.map(normalize)) if (term && haystack.includes(term)) score -= 4;
+  return score;
+}
+
+function graph(works: Work[], plan: SemanticPlan) {
   const labels = new Map<
     string,
     {
@@ -364,7 +503,21 @@ function graph(works: Work[], theme: string) {
   const concepts: any[] = [
     {
       id: "coordinate:theme",
-      label: theme,
+      label: plan.coordinates.theme,
+      count: works.length,
+      workIds: works.slice(0, 30).map((w) => w.id),
+      kind: "central",
+    },
+    {
+      id: "coordinate:subject",
+      label: plan.coordinates.subject,
+      count: works.length,
+      workIds: works.slice(0, 30).map((w) => w.id),
+      kind: "central",
+    },
+    {
+      id: "coordinate:discipline",
+      label: plan.coordinates.discipline,
       count: works.length,
       workIds: works.slice(0, 30).map((w) => w.id),
       kind: "central",
@@ -379,13 +532,18 @@ function graph(works: Work[], theme: string) {
       kind: v.kind,
     });
   const links: any[] = [];
-  for (const c of concepts.slice(1, 12))
+  links.push(
+    { source: "coordinate:theme", target: "coordinate:subject", weight: 8 },
+    { source: "coordinate:subject", target: "coordinate:discipline", weight: 7 },
+    { source: "coordinate:discipline", target: "coordinate:theme", weight: 6 },
+  );
+  for (const [index, c] of concepts.slice(3, 15).entries())
     links.push({
-      source: "coordinate:theme",
+      source: index % 3 === 0 ? "coordinate:theme" : index % 3 === 1 ? "coordinate:subject" : "coordinate:discipline",
       target: c.id,
       weight: Math.max(1, Math.round(c.count / 4)),
     });
-  for (let i = 1; i < concepts.length; i++)
+  for (let i = 3; i < concepts.length; i++)
     for (let j = i + 1; j < concepts.length; j++) {
       const a = new Set(concepts[i].workIds);
       const co = concepts[j].workIds.filter((id: string) => a.has(id)).length;
@@ -411,7 +569,8 @@ async function handleGet(request: NextRequest) {
       { error: "Informe as três coordenadas." },
       { status: 400 },
     );
-  const query = `${theme} ${subject} ${discipline}`.slice(0, 280);
+  const semanticPlan = await buildSemanticPlan(theme, subject, discipline);
+  const query = semanticPlan.queries.general;
   const providers: Provider[] = [
     { name: "Semantic Scholar", limit: process.env.SEMANTIC_SCHOLAR_API_KEY ? 100 : 60, search: semanticScholar },
     { name: "Crossref", limit: 120, search: (q) => crossrefSearch(q) },
@@ -422,9 +581,14 @@ async function handleGet(request: NextRequest) {
     { name: "arXiv", limit: 80, search: arxiv },
     { name: "CORE", limit: 100, search: core },
   ];
-  const results = await Promise.allSettled(
-    providers.map((p) => p.search(query)),
-  );
+  const queryFor = (provider: string) => {
+    if (provider === "SciELO") return semanticPlan.queries.portuguese;
+    if (provider === "arXiv") return semanticPlan.queries.technical;
+    if (provider === "Europe PMC / PubMed") return semanticPlan.queries.biomedical;
+    return semanticPlan.queries.general;
+  };
+  const providerQueries = Object.fromEntries(providers.map((p) => [p.name, queryFor(p.name)]));
+  const results = await Promise.allSettled(providers.map((p) => p.search(queryFor(p.name))));
   const warnings: string[] = [],
     groups: Work[][] = [],
     counts: Record<string, number> = {},
@@ -435,6 +599,8 @@ async function handleGet(request: NextRequest) {
       capped: boolean;
       detail?: string;
     }> = {};
+  if (semanticPlan.source === "deterministic")
+    warnings.push("O planejador semântico por IA não estava disponível; foi aplicado o fallback determinístico.");
   results.forEach((r, i) => {
     counts[providers[i].name] = r.status === "fulfilled" ? r.value.length : 0;
     if (r.status === "fulfilled") groups.push(r.value);
@@ -468,7 +634,11 @@ async function handleGet(request: NextRequest) {
       detail,
     };
   });
-  const works = dedupe(groups).slice(0, 500);
+  const works = dedupe(groups)
+    .map((work) => ({ work, score: relevanceScore(work, semanticPlan) }))
+    .sort((a, b) => b.score - a.score || b.work.citations - a.work.citations)
+    .map(({ work }) => work)
+    .slice(0, 500);
   if (works.length < 20)
     return NextResponse.json(
       {
@@ -478,11 +648,19 @@ async function handleGet(request: NextRequest) {
       },
       { status: 502 },
     );
-  const { concepts, links } = graph(works, theme);
+  const { concepts, links } = graph(works, semanticPlan);
   return NextResponse.json(
     {
-      coordinates: { theme, subject, discipline },
+      coordinates: semanticPlan.coordinates,
       query,
+      semanticPlan: {
+        intent: semanticPlan.intent,
+        inclusionTerms: semanticPlan.inclusionTerms,
+        exclusionTerms: semanticPlan.exclusionTerms,
+        queries: providerQueries,
+        rationale: semanticPlan.rationale,
+        source: semanticPlan.source,
+      },
       works: works.map(({ fields, abstract, ...w }) => w),
       concepts,
       links,

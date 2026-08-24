@@ -29,6 +29,14 @@ type Concept = {
 type Atlas = {
   coordinates: { theme: string; subject: string; discipline: string };
   query: string;
+  semanticPlan?: {
+    intent: string;
+    inclusionTerms: string[];
+    exclusionTerms: string[];
+    queries: Record<string, string>;
+    rationale: string;
+    source: "openai" | "deterministic";
+  };
   works: Work[];
   concepts: Concept[];
   links: { source: string; target: string; weight: number }[];
@@ -857,6 +865,8 @@ export default function Home() {
                     <small>
                       {c.kind === "field"
                         ? "CAMPO DE ESTUDO"
+                        : c.kind === "central"
+                          ? "COORDENADA SEMÂNTICA"
                         : "TERMO RECORRENTE"}
                     </small>
                     <h3>{c.label}</h3>
@@ -961,8 +971,8 @@ export default function Home() {
                   <b>01</b>
                   <h3>Recuperação multibase</h3>
                   <p>
-                    A consulta combina as três coordenadas e pesquisa oito
-                    serviços acadêmicos independentes.
+                    Tema, assunto e disciplina são interpretados em papéis
+                    distintos e geram consultas adequadas a cada serviço.
                   </p>
                 </article>
                 <article>
@@ -990,6 +1000,31 @@ export default function Home() {
                   </p>
                 </article>
               </div>
+              {atlas.semanticPlan && (
+                <div className="semantic-plan">
+                  <div>
+                    <span className="eyebrow">PLANO SEMÂNTICO</span>
+                    <h3>{atlas.semanticPlan.intent}</h3>
+                    <p>{atlas.semanticPlan.rationale}</p>
+                    <small>
+                      Planejador: {atlas.semanticPlan.source === "openai" ? "interpretação por IA" : "fallback determinístico"}
+                    </small>
+                  </div>
+                  <div>
+                    <h4>Vocabulário de inclusão</h4>
+                    <p>{atlas.semanticPlan.inclusionTerms.join(" · ")}</p>
+                    {atlas.semanticPlan.exclusionTerms.length > 0 && (
+                      <><h4>Termos excluídos</h4><p>{atlas.semanticPlan.exclusionTerms.join(" · ")}</p></>
+                    )}
+                  </div>
+                  <details>
+                    <summary>Ver consultas enviadas às bases</summary>
+                    {Object.entries(atlas.semanticPlan.queries).map(([provider, providerQuery]) => (
+                      <p key={provider}><b>{provider}:</b> {providerQuery}</p>
+                    ))}
+                  </details>
+                </div>
+              )}
               <div className="provenance">
                 <h3>Resultados brutos por serviço</h3>
                 {Object.entries(atlas.provenance.providerStatus || {}).map(

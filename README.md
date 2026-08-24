@@ -5,6 +5,7 @@ Aplicação web que transforma três coordenadas — **tema central**, **assunto
 ## O que está incluído
 
 - construtor guiado das três coordenadas de pesquisa;
+- interpretação semântica distinta de tema, assunto e disciplina, com consultas adaptadas por base;
 - busca simultânea em Semantic Scholar, Crossref, OpenAlex, SciELO, OpenAIRE, Europe PMC/PubMed, arXiv e CORE;
 - deduplicação por DOI e título normalizado;
 - rede tridimensional de conceitos e autores;
@@ -46,6 +47,8 @@ As chaves são opcionais: sem elas, a aplicação continua consultando as fontes
 | `SEMANTIC_SCHOLAR_API_KEY` | Não | Aumenta o limite da consulta ao Semantic Scholar. |
 | `OPENALEX_API_KEY` | Não | Autentica consultas ao OpenAlex. |
 | `CORE_API_KEY` | Não | Habilita a fonte CORE, que exige chave. |
+| `OPENAI_API_KEY` | Não | Ativa o planejador semântico das três coordenadas; sem ela, usa fallback determinístico. |
+| `OPENAI_SEMANTIC_MODEL` | Não | Modelo usado no planejamento semântico (padrão: `gpt-5-mini`). |
 
 Nunca envie `.env.local` ou chaves reais ao GitHub. O `.gitignore` bloqueia arquivos `.env*`, preservando apenas `.env.example`.
 
@@ -77,12 +80,14 @@ worker/                entrada compatível com Cloudflare Workers
 
 ## Como o atlas é construído
 
-1. As três coordenadas formam uma consulta bibliográfica.
-2. O servidor consulta até oito provedores em paralelo.
-3. Registros são unificados por DOI ou título normalizado.
-4. Termos recorrentes em títulos e campos de estudo formam os conceitos.
-5. Dois conceitos são ligados quando aparecem nos mesmos documentos.
-6. Autores são conectados aos conceitos sustentados por suas obras no corpus.
+1. Tema, assunto e disciplina são interpretados em papéis científicos distintos.
+2. O planejador cria vocabulário de inclusão/exclusão e consultas específicas para bases gerais, lusófonas, técnicas e biomédicas.
+3. O servidor consulta até oito provedores em paralelo com a estratégia adequada a cada um.
+4. Registros são unificados por DOI ou título normalizado e ordenados por aderência às coordenadas.
+5. As três coordenadas aparecem como nós estruturais do atlas.
+6. Termos recorrentes em títulos e campos de estudo formam os conceitos.
+7. Dois conceitos são ligados quando aparecem nos mesmos documentos.
+8. Autores são conectados aos conceitos sustentados por suas obras no corpus.
 
 As relações representam **coocorrência documental**, não causalidade, consenso científico ou qualidade metodológica. Consulte sempre as fontes originais.
 
@@ -98,7 +103,7 @@ O artefato é criado em `dist/`. A pasta é ignorada porque deve ser reproduzida
 
 ## Créditos
 
-Desenvolvimento: Rogério G. Bitencourt — [INOVALAB](https://rgbittencourt.github.io/inovalab-ifsc/), IFSC Câmpus Florianópolis-Continente.
+Desenvolvimento: [Rogério G. Bittencourt](https://github.com/rgbittencourt) — [INOVALAB](mailto:inovalab.cte@ifsc.edu.br), IFSC Câmpus Florianópolis-Continente.
 
 ## Licença
 
