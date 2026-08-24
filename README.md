@@ -47,6 +47,14 @@ As chaves são opcionais: sem elas, a aplicação continua consultando as fontes
 | `SEMANTIC_SCHOLAR_API_KEY` | Não | Aumenta o limite da consulta ao Semantic Scholar. |
 | `OPENALEX_API_KEY` | Não | Autentica consultas ao OpenAlex. |
 | `CORE_API_KEY` | Não | Habilita a fonte CORE, que exige chave. |
+
+### Cobertura das fontes
+
+O Retícula adapta a consulta ao vocabulário e à sintaxe de cada serviço. Europe PMC / PubMed é priorizado para saúde e biomedicina; arXiv, para computação, física, matemática, engenharia e áreas quantitativas. Em outros recortes, essas bases aparecem como **não priorizadas**, e não como defeituosas.
+
+Semantic Scholar e OpenAlex podem funcionar sem chave, mas aplicam limites mais severos e podem responder com HTTP 429. Para estabilidade, configure `SEMANTIC_SCHOLAR_API_KEY` e `OPENALEX_API_KEY`. A CORE só é ativada com `CORE_API_KEY`. Crossref, SciELO e OpenAIRE permanecem como fontes gerais sem chave obrigatória.
+
+A tradução para inglês usa primeiro a OpenAI para preservar o significado científico das três coordenadas. Se a OpenAI estiver temporariamente indisponível, o servidor tenta os tradutores públicos como contingência.
 | `OPENAI_API_KEY` | Não | Ativa o planejador semântico das três coordenadas; sem ela, usa fallback determinístico. |
 | `OPENAI_SEMANTIC_MODEL` | Não | Modelo usado no planejamento semântico (padrão: `gpt-5-mini`). |
 

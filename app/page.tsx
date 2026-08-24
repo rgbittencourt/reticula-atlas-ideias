@@ -46,7 +46,7 @@ type Atlas = {
     providers: Record<string, number>;
     providerStatus?: Record<string, {
       count: number;
-      state: "recovered" | "empty" | "rate_limited" | "not_configured" | "unavailable";
+      state: "recovered" | "empty" | "rate_limited" | "not_configured" | "not_applicable" | "unavailable";
       limit: number;
       capped: boolean;
       detail?: string;
@@ -1037,6 +1037,8 @@ export default function Home() {
                           ? "limite temporário de requisições atingido"
                           : status.state === "not_configured"
                             ? "não configurado — requer chave de acesso"
+                            : status.state === "not_applicable"
+                              ? `não priorizado para este recorte${status.detail ? ` — ${status.detail}` : ""}`
                             : "temporariamente indisponível";
                     return (
                       <p className={`provider-result provider-${status.state}`} key={name}>

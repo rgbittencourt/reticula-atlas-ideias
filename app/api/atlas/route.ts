@@ -15,7 +15,7 @@ type Work = {
   source: string;
   fields: string[];
 };
-type Provider = { name: string; limit: number; search: (query: string) => Promise<Work[]> };
+type Provider = { name: string; limit: number; search: (query: string) => Promise<Work[]>; applicable?: boolean; reason?: string };
 
 type SemanticPlan = {
   coordinates: { theme: string; subject: string; discipline: string };
@@ -158,6 +158,15 @@ const normalize = (value: unknown) =>
     .replace(/[^a-z0-9\s-]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+
+function providerSafeQuery(value: string) {
+  return value
+    .replace(/\b(?:AND|OR|NOT)\b/gi, " ")
+    .replace(/[()"']/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 240);
+}
 const titleOf = (v: unknown) =>
   Array.isArray(v) ? String(v[0] || "") : String(v || "");
 const yearOf = (parts: any) => (parts?.[0]?.[0] ? Number(parts[0][0]) : null);
@@ -296,8 +305,9 @@ async function openAlex(query: string): Promise<Work[]> {
 }
 
 async function openAire(query: string): Promise<Work[]> {
+  const safeQuery = providerSafeQuery(query);
   const r = await timedFetch(
-    `https://api.openaire.eu/graph/v3/research-products?search=${encodeURIComponent(query)}&type=publication&pageSize=100`,
+    `https://api.openaire.eu/graph/v3/research-products?search=${encodeURIComponent(safeQuery)}&type=publication&pageSize=100`,
   );
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const j: any = await r.json();
@@ -358,8 +368,9 @@ async function europePmc(query: string): Promise<Work[]> {
 }
 
 async function arxiv(query: string): Promise<Work[]> {
+  const safeQuery = providerSafeQuery(query);
   const responses = await Promise.all([0, 40].map((start) => timedFetch(
-    `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(query)}&start=${start}&max_results=40`, {
+    `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(safeQuery)}&start=${start}&max_results=40`, {
       headers: { "User-Agent": "ReticulaAtlas/2.0 (inovalab.cte@ifsc.edu.br)" },
     })));
   const failed = responses.find((r) => !r.ok);
@@ -571,14 +582,17 @@ async function handleGet(request: NextRequest) {
     );
   const semanticPlan = await buildSemanticPlan(theme, subject, discipline);
   const query = semanticPlan.queries.general;
+  const domainText = normalize(`${semanticPlan.coordinates.discipline} ${semanticPlan.intent} ${semanticPlan.inclusionTerms.join(" ")}`);
+  const biomedical = /medic|health|saude|clinical|clinic|nurs|enferm|biolog|biomed|pharma|epidemi|public health/.test(domainText);
+  const technical = /computer|comput|informat|engineer|engenh|physics|fisic|mathemat|matematic|artificial intelligence|machine learning|data science|robot|ocean|climat|econom/.test(domainText);
   const providers: Provider[] = [
     { name: "Semantic Scholar", limit: process.env.SEMANTIC_SCHOLAR_API_KEY ? 100 : 60, search: semanticScholar },
     { name: "Crossref", limit: 120, search: (q) => crossrefSearch(q) },
     { name: "OpenAlex", limit: 100, search: openAlex },
     { name: "SciELO", limit: 80, search: (q) => crossrefSearch(q, true) },
     { name: "OpenAIRE", limit: 100, search: openAire },
-    { name: "Europe PMC / PubMed", limit: 100, search: europePmc },
-    { name: "arXiv", limit: 80, search: arxiv },
+    { name: "Europe PMC / PubMed", limit: 100, search: europePmc, applicable: biomedical, reason: "prioriza literatura biomédica e de ciências da saúde" },
+    { name: "arXiv", limit: 80, search: arxiv, applicable: technical, reason: "prioriza computação, física, matemática, engenharia e áreas quantitativas" },
     { name: "CORE", limit: 100, search: core },
   ];
   const queryFor = (provider: string) => {
@@ -588,13 +602,13 @@ async function handleGet(request: NextRequest) {
     return semanticPlan.queries.general;
   };
   const providerQueries = Object.fromEntries(providers.map((p) => [p.name, queryFor(p.name)]));
-  const results = await Promise.allSettled(providers.map((p) => p.search(queryFor(p.name))));
+  const results = await Promise.allSettled(providers.map((p) => p.applicable === false ? Promise.resolve([]) : p.search(queryFor(p.name))));
   const warnings: string[] = [],
     groups: Work[][] = [],
     counts: Record<string, number> = {},
     providerStatus: Record<string, {
       count: number;
-      state: "recovered" | "empty" | "rate_limited" | "not_configured" | "unavailable";
+      state: "recovered" | "empty" | "rate_limited" | "not_configured" | "not_applicable" | "unavailable";
       limit: number;
       capped: boolean;
       detail?: string;
@@ -604,7 +618,7 @@ async function handleGet(request: NextRequest) {
   results.forEach((r, i) => {
     counts[providers[i].name] = r.status === "fulfilled" ? r.value.length : 0;
     if (r.status === "fulfilled") groups.push(r.value);
-    else
+    else if (providers[i].applicable !== false)
       warnings.push(
         `${providers[i].name} indisponível nesta consulta: ${r.reason?.message || "erro externo"}`,
       );
@@ -612,6 +626,16 @@ async function handleGet(request: NextRequest) {
   results.forEach((result, index) => {
     const provider = providers[index];
     const count = result.status === "fulfilled" ? result.value.length : 0;
+    if (provider.applicable === false) {
+      providerStatus[provider.name] = {
+        count: 0,
+        state: "not_applicable",
+        limit: provider.limit,
+        capped: false,
+        detail: provider.reason,
+      };
+      return;
+    }
     if (result.status === "fulfilled") {
       providerStatus[provider.name] = {
         count,

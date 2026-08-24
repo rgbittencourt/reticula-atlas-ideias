@@ -783,6 +783,7 @@
 .provider-empty { border-left-color: #9aa09b; color: #59625e; }
 .provider-rate_limited, .provider-unavailable { border-left-color: #b77935; color: #85551f; }
 .provider-not_configured { border-left-color: #6f7780; color: #59616a; }
+.provider-not_applicable { border-left-color: #b8a995; color: #786f65; }
 .semantic-plan{margin-top:30px;padding:26px;border:1px solid #c9b7aa;background:#fffaf4;display:grid;grid-template-columns:1.1fr .9fr;gap:24px}.semantic-plan>div{min-width:0}.semantic-plan h3{font:26px/1.15 Newsreader;margin:10px 0;color:#3b2922}.semantic-plan h4{font:700 9px DM Mono;letter-spacing:1.2px;text-transform:uppercase;color:#704c3d;margin:3px 0 9px}.semantic-plan p{font:12px/1.65 Manrope;color:#655a54;margin:0 0 12px}.semantic-plan small{font:8px DM Mono;color:#877a73}.semantic-plan details{grid-column:1/-1;border-top:1px solid #e0d8d1;padding-top:16px}.semantic-plan summary{cursor:pointer;font:700 10px DM Mono;color:#563a2f}.semantic-plan details p{margin:11px 0 0;overflow-wrap:anywhere}.semantic-plan details b{color:#3f2c25}
 @media(max-width:700px){.semantic-plan{grid-template-columns:1fr}.semantic-plan details{grid-column:1}}
 
