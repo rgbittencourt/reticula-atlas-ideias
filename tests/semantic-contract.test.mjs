@@ -30,6 +30,7 @@ test("adapta consultas e fontes ao domínio pesquisado", () => {
   assert.match(route, /DataCite/);
   assert.match(route, /LA Referencia/);
   assert.match(route, /Repositórios BR \(OAI-PMH\)/);
+  assert.match(route, /discoveryQuery/);
 });
 
 test("traduz as coordenadas com contexto científico e mantém contingência", () => {

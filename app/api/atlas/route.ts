@@ -553,7 +553,17 @@ const oasisBdtd = (query: string) => Promise.allSettled([
   return works;
 });
 
-const laReferencia = (query: string) => vuFindSearch("https://www.lareferencia.info", "LA Referencia", query);
+async function laReferencia(query: string): Promise<Work[]> {
+  const phrases = [...query.matchAll(/"([^"]{3,80})"/g)].map((m) => m[1]);
+  const candidates = [...new Set(phrases.length ? phrases : [providerSafeQuery(query)])].slice(0, 3);
+  const results = await Promise.allSettled(candidates.map((candidate) =>
+    vuFindSearch("https://www.lareferencia.info", "LA Referencia", candidate),
+  ));
+  const works = results.flatMap((r) => r.status === "fulfilled" ? r.value : []);
+  if (!works.length && results.every((r) => r.status === "rejected"))
+    throw new Error("LA Referencia não respondeu dentro do limite de tempo");
+  return works;
+}
 
 function dedupe(groups: Work[][]): Work[] {
   const map = new Map<string, Work>();
@@ -726,12 +736,15 @@ async function handleGet(request: NextRequest) {
     { name: "Repositórios BR (OAI-PMH)", limit: 0, search: async () => [], mode: "aggregated", reason: "cobertos pelo agregador nacional Oasisbr/IBICT" },
   ];
   const coordinateFallback = providerSafeQuery(`${theme} ${subject} ${discipline}`);
+  const discoveryQuery = providerSafeQuery(`${semanticPlan.coordinates.theme} ${semanticPlan.coordinates.subject}`) || coordinateFallback;
   const usableQuery = (candidate: string) => {
     const safe = providerSafeQuery(candidate);
     return /[a-z0-9à-ÿ]{3}/i.test(safe) ? candidate : coordinateFallback;
   };
   const queryFor = (provider: string) => {
-    if (["SciELO", "Oasisbr / BDTD", "LA Referencia"].includes(provider)) return usableQuery(semanticPlan.queries.portuguese);
+    if (["Oasisbr / BDTD", "DOAJ", "DataCite"].includes(provider)) return discoveryQuery;
+    if (provider === "LA Referencia") return usableQuery(semanticPlan.queries.technical);
+    if (provider === "SciELO") return usableQuery(semanticPlan.queries.portuguese);
     if (["arXiv", "ERIC"].includes(provider)) return usableQuery(semanticPlan.queries.technical);
     if (provider === "Europe PMC / PubMed") return usableQuery(semanticPlan.queries.biomedical);
     return usableQuery(semanticPlan.queries.general);
