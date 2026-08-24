@@ -23,6 +23,13 @@ test("adapta consultas e fontes ao domínio pesquisado", () => {
   assert.match(route, /not_applicable/);
   assert.match(route, /coordinateFallback/);
   assert.match(route, /usableQuery/);
+  assert.match(route, /Oasisbr \/ BDTD/);
+  assert.match(route, /DOAJ/);
+  assert.match(route, /CAPES Teses e Dissertações/);
+  assert.match(route, /applicable: education/);
+  assert.match(route, /DataCite/);
+  assert.match(route, /LA Referencia/);
+  assert.match(route, /Repositórios BR \(OAI-PMH\)/);
 });
 
 test("traduz as coordenadas com contexto científico e mantém contingência", () => {

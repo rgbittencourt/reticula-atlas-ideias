@@ -55,6 +55,16 @@ O Retícula adapta a consulta ao vocabulário e à sintaxe de cada serviço. Eur
 Semantic Scholar e OpenAlex podem funcionar sem chave, mas aplicam limites mais severos e podem responder com HTTP 429. Para estabilidade, configure `SEMANTIC_SCHOLAR_API_KEY` e `OPENALEX_API_KEY`. A CORE só é ativada com `CORE_API_KEY`. Crossref, SciELO e OpenAIRE permanecem como fontes gerais sem chave obrigatória.
 
 A tradução para inglês usa primeiro a OpenAI para preservar o significado científico das três coordenadas. Se a OpenAI estiver temporariamente indisponível, o servidor tenta os tradutores públicos como contingência.
+
+### Fontes brasileiras, latino-americanas e de acesso aberto
+
+- **Oasisbr / BDTD (IBICT):** produção de repositórios brasileiros, teses e dissertações. Os servidores recebem limite de tempo isolado para não atrasar as demais bases.
+- **DOAJ:** artigos de periódicos de acesso aberto.
+- **CAPES Teses e Dissertações:** catálogo nacional identificado no painel. Como a CAPES distribui arquivos anuais, sua incorporação integral depende de uma rotina de indexação periódica, e não de uma consulta HTTP por pesquisa.
+- **ERIC:** ativado semanticamente para Educação, ensino, escola e aprendizagem.
+- **DataCite:** amplia a descoberta para teses, datasets, relatórios e outros objetos com DOI.
+- **LA Referencia:** repositórios científicos da América Latina.
+- **Repositórios institucionais brasileiros via OAI-PMH:** representados pelo agregador Oasisbr, evitando consultar centenas de servidores e duplicar registros a cada pesquisa.
 | `OPENAI_API_KEY` | Não | Ativa o planejador semântico das três coordenadas; sem ela, usa fallback determinístico. |
 | `OPENAI_SEMANTIC_MODEL` | Não | Modelo usado no planejamento semântico (padrão: `gpt-5-mini`). |
 

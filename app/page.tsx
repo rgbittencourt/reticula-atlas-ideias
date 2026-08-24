@@ -46,7 +46,7 @@ type Atlas = {
     providers: Record<string, number>;
     providerStatus?: Record<string, {
       count: number;
-      state: "recovered" | "empty" | "rate_limited" | "not_configured" | "not_applicable" | "unavailable";
+      state: "recovered" | "empty" | "rate_limited" | "not_configured" | "not_applicable" | "catalog_only" | "aggregated" | "unavailable";
       limit: number;
       capped: boolean;
       detail?: string;
@@ -1039,6 +1039,10 @@ export default function Home() {
                             ? "não configurado — requer chave de acesso"
                             : status.state === "not_applicable"
                               ? `não priorizado para este recorte${status.detail ? ` — ${status.detail}` : ""}`
+                            : status.state === "catalog_only"
+                              ? `catálogo integrado por atualização periódica${status.detail ? ` — ${status.detail}` : ""}`
+                            : status.state === "aggregated"
+                              ? `cobertura consolidada${status.detail ? ` — ${status.detail}` : ""}`
                             : "temporariamente indisponível";
                     return (
                       <p className={`provider-result provider-${status.state}`} key={name}>
@@ -1053,8 +1057,9 @@ export default function Home() {
                 <p>
                   <small>
                     SciELO Brasil é recuperado pelo prefixo DOI 10.1590 no
-                    Crossref. Europe PMC inclui registros PubMed. Depois da
-                    coleta, as duplicatas são consolidadas.
+                    Crossref. Europe PMC inclui registros PubMed. Oasisbr reúne
+                    repositórios brasileiros via OAI-PMH. Depois da coleta, as
+                    duplicatas são consolidadas.
                   </small>
                 </p>
                 {atlas.provenance.warnings.map((w) => (

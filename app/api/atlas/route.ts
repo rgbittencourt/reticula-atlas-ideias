@@ -15,7 +15,14 @@ type Work = {
   source: string;
   fields: string[];
 };
-type Provider = { name: string; limit: number; search: (query: string) => Promise<Work[]>; applicable?: boolean; reason?: string };
+type Provider = {
+  name: string;
+  limit: number;
+  search: (query: string) => Promise<Work[]>;
+  applicable?: boolean;
+  reason?: string;
+  mode?: "catalog_only" | "aggregated";
+};
 
 type SemanticPlan = {
   coordinates: { theme: string; subject: string; discipline: string };
@@ -200,8 +207,13 @@ const blocks = (xml: string, tag: string) =>
   ].map((m) => m[1]);
 
 async function timedFetch(input: string, init: RequestInit = {}, timeoutMs = 12_000) {
-  void timeoutMs;
-  return fetch(input, init);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function semanticScholar(query: string): Promise<Work[]> {
@@ -433,6 +445,116 @@ async function core(query: string): Promise<Work[]> {
     }));
 }
 
+async function doaj(query: string): Promise<Work[]> {
+  const safe = providerSafeQuery(query);
+  const r = await timedFetch(`https://doaj.org/api/search/articles/${encodeURIComponent(safe)}?pageSize=80`, {
+    headers: { "User-Agent": "ReticulaAtlas/2.0 (inovalab.cte@ifsc.edu.br)" },
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j: any = await r.json();
+  return (j.results || []).map((record: any) => {
+    const p = record.bibjson || {};
+    const doi = (p.identifier || []).find((x: any) => x.type === "doi")?.id || null;
+    return {
+      id: `doaj:${record.id || doi || normalize(p.title)}`,
+      title: p.title || "",
+      year: Number(p.year) || null,
+      authors: (p.author || []).map((a: any) => a.name).filter(Boolean),
+      venue: p.journal?.title || "",
+      doi,
+      url: doi ? `https://doi.org/${doi}` : (p.link || []).find((x: any) => x.type === "fulltext")?.url || `https://doaj.org/article/${record.id}`,
+      abstract: strip(p.abstract),
+      citations: 0,
+      source: "DOAJ",
+      fields: [...(p.keywords || []), ...(p.subject || []).map((x: any) => x.term).filter(Boolean)],
+    };
+  }).filter((p: Work) => p.title);
+}
+
+async function datacite(query: string): Promise<Work[]> {
+  const safe = providerSafeQuery(query);
+  const r = await timedFetch(`https://api.datacite.org/dois?query=${encodeURIComponent(safe)}&page%5Bsize%5D=80`);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j: any = await r.json();
+  return (j.data || []).map((record: any) => {
+    const p = record.attributes || {};
+    const doi = p.doi || record.id || null;
+    return {
+      id: `datacite:${doi || normalize(p.titles?.[0]?.title)}`,
+      title: p.titles?.[0]?.title || "",
+      year: Number(p.publicationYear) || null,
+      authors: (p.creators || []).map((a: any) => a.name || [a.givenName, a.familyName].filter(Boolean).join(" ")).filter(Boolean),
+      venue: p.container?.title || p.publisher || "",
+      doi,
+      url: doi ? `https://doi.org/${doi}` : p.url || "",
+      abstract: strip((p.descriptions || []).find((x: any) => x.descriptionType === "Abstract")?.description),
+      citations: Number(p.citationCount) || 0,
+      source: "DataCite",
+      fields: (p.subjects || []).map((x: any) => x.subject).filter(Boolean),
+    };
+  }).filter((p: Work) => p.title);
+}
+
+async function eric(query: string): Promise<Work[]> {
+  const safe = providerSafeQuery(query);
+  const r = await timedFetch(`https://api.ies.ed.gov/eric/?search=${encodeURIComponent(safe)}&format=json&rows=80`);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const text = await r.text();
+  const j: any = JSON.parse(text);
+  return (j.response?.docs || []).map((p: any) => ({
+    id: `eric:${p.id}`,
+    title: p.title || "",
+    year: Number(p.publicationdateyear) || null,
+    authors: p.author || [],
+    venue: p.source || p.publisher || "ERIC",
+    doi: p.doi || null,
+    url: p.doi ? `https://doi.org/${p.doi}` : `https://eric.ed.gov/?id=${p.id}`,
+    abstract: strip(p.description),
+    citations: 0,
+    source: "ERIC",
+    fields: [...(p.subject || []), ...(p.publicationtype || [])],
+  })).filter((p: Work) => p.title);
+}
+
+async function vuFindSearch(base: string, source: string, query: string): Promise<Work[]> {
+  const safe = providerSafeQuery(query);
+  const r = await timedFetch(`${base}/vufind/api/v1/search?lookfor=${encodeURIComponent(safe)}&type=AllFields&page=1&limit=60`, {
+    headers: { "User-Agent": "ReticulaAtlas/2.0 (inovalab.cte@ifsc.edu.br)" },
+  }, 10_000);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j: any = await r.json();
+  return (j.records || []).map((p: any) => {
+    const urls = p.urls || [];
+    const doiUrl = urls.find((x: any) => /doi\.org/i.test(x.url || x));
+    const doi = String(doiUrl?.url || doiUrl || "").match(/10\.\d{4,9}\/\S+/)?.[0]?.replace(/[),.;]+$/, "") || null;
+    const primary = p.authors?.primary || {};
+    return {
+      id: `${normalize(source)}:${p.id || doi || normalize(p.title)}`,
+      title: titleOf(p.title),
+      year: Number(p.publishDate?.[0] || p.year) || null,
+      authors: Array.isArray(primary) ? primary : Object.keys(primary),
+      venue: p.institution || p.publisher || p.country || "",
+      doi,
+      url: doi ? `https://doi.org/${doi}` : (urls[0]?.url || urls[0] || ""),
+      abstract: strip(p.summary?.[0] || p.summary),
+      citations: 0,
+      source,
+      fields: (p.subjects || []).flat().filter(Boolean),
+    };
+  }).filter((p: Work) => p.title);
+}
+
+const oasisBdtd = (query: string) => Promise.allSettled([
+  vuFindSearch("https://oasisbr.ibict.br", "Oasisbr", query),
+  vuFindSearch("https://bdtd.ibict.br", "BDTD", query),
+]).then((results) => {
+  const works = results.flatMap((r) => r.status === "fulfilled" ? r.value : []);
+  if (!works.length) throw new Error("IBICT não respondeu dentro do limite de tempo");
+  return works;
+});
+
+const laReferencia = (query: string) => vuFindSearch("https://www.lareferencia.info", "LA Referencia", query);
+
 function dedupe(groups: Work[][]): Work[] {
   const map = new Map<string, Work>();
   for (const w of groups.flat()) {
@@ -585,6 +707,7 @@ async function handleGet(request: NextRequest) {
   const domainText = normalize(`${semanticPlan.coordinates.discipline} ${semanticPlan.intent} ${semanticPlan.inclusionTerms.join(" ")}`);
   const biomedical = /medic|health|saude|clinical|clinic|nurs|enferm|biolog|biomed|pharma|epidemi|public health/.test(domainText);
   const technical = /computer|comput|informat|engineer|engenh|physics|fisic|mathemat|matematic|artificial intelligence|machine learning|data science|robot|ocean|climat|econom/.test(domainText);
+  const education = /educa|pedagog|teaching|learning|school|ensino|aprendiz/.test(domainText);
   const providers: Provider[] = [
     { name: "Semantic Scholar", limit: process.env.SEMANTIC_SCHOLAR_API_KEY ? 100 : 60, search: semanticScholar },
     { name: "Crossref", limit: 120, search: (q) => crossrefSearch(q) },
@@ -594,6 +717,13 @@ async function handleGet(request: NextRequest) {
     { name: "Europe PMC / PubMed", limit: 100, search: europePmc, applicable: biomedical, reason: "prioriza literatura biomédica e de ciências da saúde" },
     { name: "arXiv", limit: 80, search: arxiv, applicable: technical, reason: "prioriza computação, física, matemática, engenharia e áreas quantitativas" },
     { name: "CORE", limit: 100, search: core },
+    { name: "Oasisbr / BDTD", limit: 120, search: oasisBdtd },
+    { name: "DOAJ", limit: 80, search: doaj },
+    { name: "CAPES Teses e Dissertações", limit: 0, search: async () => [], mode: "catalog_only", reason: "a CAPES publica conjuntos anuais; a busca exige indexação periódica própria" },
+    { name: "ERIC", limit: 80, search: eric, applicable: education, reason: "prioriza Educação, ensino e aprendizagem" },
+    { name: "DataCite", limit: 80, search: datacite },
+    { name: "LA Referencia", limit: 60, search: laReferencia },
+    { name: "Repositórios BR (OAI-PMH)", limit: 0, search: async () => [], mode: "aggregated", reason: "cobertos pelo agregador nacional Oasisbr/IBICT" },
   ];
   const coordinateFallback = providerSafeQuery(`${theme} ${subject} ${discipline}`);
   const usableQuery = (candidate: string) => {
@@ -601,19 +731,19 @@ async function handleGet(request: NextRequest) {
     return /[a-z0-9à-ÿ]{3}/i.test(safe) ? candidate : coordinateFallback;
   };
   const queryFor = (provider: string) => {
-    if (provider === "SciELO") return usableQuery(semanticPlan.queries.portuguese);
-    if (provider === "arXiv") return usableQuery(semanticPlan.queries.technical);
+    if (["SciELO", "Oasisbr / BDTD", "LA Referencia"].includes(provider)) return usableQuery(semanticPlan.queries.portuguese);
+    if (["arXiv", "ERIC"].includes(provider)) return usableQuery(semanticPlan.queries.technical);
     if (provider === "Europe PMC / PubMed") return usableQuery(semanticPlan.queries.biomedical);
     return usableQuery(semanticPlan.queries.general);
   };
   const providerQueries = Object.fromEntries(providers.map((p) => [p.name, queryFor(p.name)]));
-  const results = await Promise.allSettled(providers.map((p) => p.applicable === false ? Promise.resolve([]) : p.search(queryFor(p.name))));
+  const results = await Promise.allSettled(providers.map((p) => p.applicable === false || p.mode ? Promise.resolve([]) : p.search(queryFor(p.name))));
   const warnings: string[] = [],
     groups: Work[][] = [],
     counts: Record<string, number> = {},
     providerStatus: Record<string, {
       count: number;
-      state: "recovered" | "empty" | "rate_limited" | "not_configured" | "not_applicable" | "unavailable";
+      state: "recovered" | "empty" | "rate_limited" | "not_configured" | "not_applicable" | "catalog_only" | "aggregated" | "unavailable";
       limit: number;
       capped: boolean;
       detail?: string;
@@ -631,6 +761,16 @@ async function handleGet(request: NextRequest) {
   results.forEach((result, index) => {
     const provider = providers[index];
     const count = result.status === "fulfilled" ? result.value.length : 0;
+    if (provider.mode) {
+      providerStatus[provider.name] = {
+        count: 0,
+        state: provider.mode,
+        limit: provider.limit,
+        capped: false,
+        detail: provider.reason,
+      };
+      return;
+    }
     if (provider.applicable === false) {
       providerStatus[provider.name] = {
         count: 0,
