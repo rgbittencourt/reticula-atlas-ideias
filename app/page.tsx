@@ -66,6 +66,26 @@ type Tab =
 type GraphScope = "completa" | "conceitos" | "autores";
 type AuthorPhoto = { image: string; page: string; description: string };
 
+const RETICULA_SERVICES = [
+  "OpenAI · análise semântica",
+  "Semantic Scholar",
+  "Crossref",
+  "OpenAlex",
+  "SciELO",
+  "OpenAIRE",
+  "Europe PMC / PubMed",
+  "arXiv",
+  "CORE",
+  "Oasisbr / IBICT",
+  "BDTD / IBICT",
+  "DOAJ",
+  "CAPES Dados Abertos",
+  "ERIC",
+  "DataCite",
+  "LA Referencia",
+  "Repositórios BR · OAI-PMH",
+] as const;
+
 const clean = (s: string) =>
   s
     .normalize("NFD")
@@ -597,8 +617,8 @@ export default function Home() {
               para transformar uma ideia inicial em um recorte acadêmico
               pesquisável.
             </p>
-            <div className="source-badges" aria-label="Bases acadêmicas consultadas">
-              {["Semantic Scholar", "Crossref", "OpenAlex", "SciELO", "OpenAIRE", "Europe PMC / PubMed", "arXiv", "CORE"].map((source) => (
+            <div className="source-badges" aria-label="Serviços e bases utilizados pelo Retícula">
+              {RETICULA_SERVICES.map((source) => (
                 <span key={source}>{source}</span>
               ))}
             </div>
