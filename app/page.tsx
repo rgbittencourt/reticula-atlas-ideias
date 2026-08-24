@@ -497,9 +497,15 @@ export default function Home() {
           <h2>Relações ganham<br/>sentido.</h2>
           <p className="cover-description">Transforme um tema de pesquisa em uma rede viva de conceitos, autores e evidências científicas verificáveis.</p>
         </div>
-        <div className="cover-signature">
-          <span className="cover-r">R</span>
-          <div><strong>Retícula</strong><small>Conhecimento conectado, fonte por fonte.</small></div>
+        <div className="cover-credits">
+          <p>DESENVOLVIDO POR</p>
+          <a className="cover-developer" href="https://github.com/rgbittencourt" target="_blank" rel="noreferrer">
+            Prof. Rogério G. Bittencourt
+          </a>
+          <a className="cover-lab" href="mailto:inovalab.cte@ifsc.edu.br">
+            <img src="/inovalab-logo-v2.png" alt="" />
+            <span><strong>INOVALAB</strong><small>Laboratório de Inovação e Mídias Digitais</small></span>
+          </a>
         </div>
       </section>
 
@@ -1106,10 +1112,8 @@ export default function Home() {
       <footer className="site-footer">
         <a
           className="inovalab-logo"
-          href="https://rgbittencourt.github.io/inovalab-ifsc/"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Visitar a página do INOVALAB"
+          href="mailto:inovalab.cte@ifsc.edu.br"
+          aria-label="Enviar e-mail ao INOVALAB"
         >
           <img
             src="/inovalab-logo-v2.png"
@@ -1128,14 +1132,12 @@ export default function Home() {
           <p>
             Desenvolvimento desta teia interativa:{" "}
             <strong>
-              <a href="mailto:inovalab.cte@ifsc.edu.br">
-                Rogério G. Bitencourt
+              <a href="https://github.com/rgbittencourt" target="_blank" rel="noreferrer">
+                Rogério G. Bittencourt
               </a>{" "}
               (
               <a
-                href="https://rgbittencourt.github.io/inovalab-ifsc/"
-                target="_blank"
-                rel="noreferrer"
+                href="mailto:inovalab.cte@ifsc.edu.br"
               >
                 INOVALAB
               </a>{" "}
