@@ -595,11 +595,16 @@ async function handleGet(request: NextRequest) {
     { name: "arXiv", limit: 80, search: arxiv, applicable: technical, reason: "prioriza computação, física, matemática, engenharia e áreas quantitativas" },
     { name: "CORE", limit: 100, search: core },
   ];
+  const coordinateFallback = providerSafeQuery(`${theme} ${subject} ${discipline}`);
+  const usableQuery = (candidate: string) => {
+    const safe = providerSafeQuery(candidate);
+    return /[a-z0-9à-ÿ]{3}/i.test(safe) ? candidate : coordinateFallback;
+  };
   const queryFor = (provider: string) => {
-    if (provider === "SciELO") return semanticPlan.queries.portuguese;
-    if (provider === "arXiv") return semanticPlan.queries.technical;
-    if (provider === "Europe PMC / PubMed") return semanticPlan.queries.biomedical;
-    return semanticPlan.queries.general;
+    if (provider === "SciELO") return usableQuery(semanticPlan.queries.portuguese);
+    if (provider === "arXiv") return usableQuery(semanticPlan.queries.technical);
+    if (provider === "Europe PMC / PubMed") return usableQuery(semanticPlan.queries.biomedical);
+    return usableQuery(semanticPlan.queries.general);
   };
   const providerQueries = Object.fromEntries(providers.map((p) => [p.name, queryFor(p.name)]));
   const results = await Promise.allSettled(providers.map((p) => p.applicable === false ? Promise.resolve([]) : p.search(queryFor(p.name))));

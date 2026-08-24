@@ -21,6 +21,8 @@ test("adapta consultas e fontes ao domínio pesquisado", () => {
   assert.match(route, /applicable: biomedical/);
   assert.match(route, /applicable: technical/);
   assert.match(route, /not_applicable/);
+  assert.match(route, /coordinateFallback/);
+  assert.match(route, /usableQuery/);
 });
 
 test("traduz as coordenadas com contexto científico e mantém contingência", () => {
