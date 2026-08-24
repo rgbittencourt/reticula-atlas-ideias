@@ -736,7 +736,7 @@ async function handleGet(request: NextRequest) {
     { name: "Repositórios BR (OAI-PMH)", limit: 0, search: async () => [], mode: "aggregated", reason: "cobertos pelo agregador nacional Oasisbr/IBICT" },
   ];
   const coordinateFallback = providerSafeQuery(`${theme} ${subject} ${discipline}`);
-  const discoveryQuery = providerSafeQuery(`${semanticPlan.coordinates.theme} ${semanticPlan.coordinates.subject}`) || coordinateFallback;
+  const discoveryQuery = providerSafeQuery(`${theme} ${subject}`) || coordinateFallback;
   const usableQuery = (candidate: string) => {
     const safe = providerSafeQuery(candidate);
     return /[a-z0-9à-ÿ]{3}/i.test(safe) ? candidate : coordinateFallback;
