@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import { downloadRisExport } from "./ris";
 
 const ForceGraph3D = dynamic(() => import("react-force-graph-3d"), {
   ssr: false,
@@ -266,6 +267,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [guideOpen, setGuideOpen] = useState(false);
+  const [exportNotice, setExportNotice] = useState("");
   const [brief, setBrief] = useState("");
   const [suggestion, setSuggestion] = useState<{
     theme: string;
@@ -510,6 +512,19 @@ export default function Home() {
     setTab(next);
     setQuery("");
   }
+  function exportRis() {
+    if (!atlas || !filteredWorks.length) return;
+    const generatedAt = new Date().toISOString();
+    downloadRisExport({
+      works: filteredWorks,
+      query: atlas.query,
+      coordinates: atlas.coordinates,
+      generatedAt,
+    });
+    setExportNotice(
+      `Arquivo RIS com ${filteredWorks.length} registro${filteredWorks.length === 1 ? "" : "s"} gerado. A consulta e a proveniência foram incluídas nas notas de cada referência.`,
+    );
+  }
 
   if (showCover) return (
     <main className="reticula-cover">
@@ -729,10 +744,19 @@ export default function Home() {
               {atlas.concepts.length} conceitos · {authors.length} autores ·{" "}
               {atlas.works.length} obras
             </span>
+            <button
+              className="export-ris"
+              onClick={exportRis}
+              disabled={!filteredWorks.length}
+              title="Exportar os registros atualmente filtrados em formato RIS"
+            >
+              Exportar RIS ({filteredWorks.length}) ↓
+            </button>
             <button onClick={() => chooseTab("metodo")}>
               Método e proveniência
             </button>
           </div>
+          <p className="export-notice" aria-live="polite">{exportNotice}</p>
           {tab === "rede" && (
             <div className="workspace">
               <div className="graph3d" ref={graphHostRef}>
@@ -933,6 +957,9 @@ export default function Home() {
                   cada um rastreável.
                 </h2>
                 <p>DOI e página original preservados para conferência.</p>
+                <button className="export-ris export-ris-inline" onClick={exportRis} disabled={!filteredWorks.length}>
+                  Exportar estes {filteredWorks.length} registros em RIS ↓
+                </button>
               </div>
               <ol>
                 {filteredWorks.map((w, i) => (
