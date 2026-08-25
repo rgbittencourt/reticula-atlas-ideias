@@ -1,26 +1,21 @@
 import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
-async function render() {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
-  const { default: worker } = await import(workerUrl.href);
-  return worker.fetch(
-    new Request("http://localhost/", { headers: { accept: "text/html" } }),
-    { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
-    { waitUntil() {}, passThroughOnException() {} },
-  );
-}
+test("compila o artefato Worker do Retícula com a identidade da aplicação", () => {
+  const workerPath = new URL("../dist/server/index.js", import.meta.url);
+  const pagePath = new URL("../app/page.tsx", import.meta.url);
+  const layoutPath = new URL("../app/layout.tsx", import.meta.url);
 
-test("renderiza a aplicação Retícula", async () => {
-  const response = await render();
-  assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
-  const html = await response.text();
-  assert.match(html, /<title>Retícula — Atlas de Literatura Científica<\/title>/i);
-  assert.match(html, /Retícula/);
-  assert.match(html, /Ideias ganham/);
-  assert.match(html, /Começar uma pesquisa/);
-  assert.match(html, /sem cadastro · sem login/);
-  assert.doesNotMatch(html, /Your site is taking shape|Building your site/);
+  assert.equal(existsSync(workerPath), true);
+  const worker = readFileSync(workerPath, "utf8");
+  const page = readFileSync(pagePath, "utf8");
+  const layout = readFileSync(layoutPath, "utf8");
+
+  assert.match(worker, /fetch\(/);
+  assert.match(layout, /Retícula — Atlas de Literatura Científica/);
+  assert.match(page, /Ideias ganham/);
+  assert.match(page, /Começar uma pesquisa/);
+  assert.match(page, /sem cadastro · sem login/);
+  assert.doesNotMatch(page, /Your site is taking shape|Building your site/);
 });

@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { downloadRisExport } from "./ris";
+import { downloadBibtexExport, downloadCsvExport, downloadRisExport, type BibliographicFormat } from "./ris";
 
 const ForceGraph3D = dynamic(() => import("react-force-graph-3d"), {
   ssr: false,
@@ -86,6 +86,21 @@ const RETICULA_SERVICES = [
   "LA Referencia",
   "Repositórios BR · OAI-PMH",
 ] as const;
+
+const ACADEMIAOS_SEARCH_URL = "https://acadcarto-dbjwmxfb.manus.space/search";
+const contextValue = (value: string | null | undefined, maximum = 240) =>
+  (value ?? "").replace(/[\u0000-\u001F\u007F]/g, " ").replace(/\s+/g, " ").trim().slice(0, maximum);
+
+function cartographerSearchUrl(atlas: Atlas) {
+  const params = new URLSearchParams({
+    query: contextValue(atlas.query),
+    source: "reticula",
+    theme: contextValue(atlas.coordinates.theme),
+    subject: contextValue(atlas.coordinates.subject),
+    discipline: contextValue(atlas.coordinates.discipline),
+  });
+  return `${ACADEMIAOS_SEARCH_URL}?${params.toString()}`;
+}
 
 const clean = (s: string) =>
   s
@@ -280,6 +295,23 @@ export default function Home() {
   const graphRef = useRef<any>(null);
   const graphHostRef = useRef<HTMLDivElement>(null);
   const [graphSize, setGraphSize] = useState({ width: 1, height: 1 });
+  const handledIncomingContext = useRef(false);
+
+  useEffect(() => {
+    if (handledIncomingContext.current || typeof window === "undefined") return;
+    handledIncomingContext.current = true;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("from") !== "academiaos") return;
+    const incomingTheme = contextValue(params.get("theme"));
+    const incomingSubject = contextValue(params.get("subject"));
+    const incomingDiscipline = contextValue(params.get("discipline"));
+    if (!incomingTheme && !incomingSubject && !incomingDiscipline) return;
+    setTheme(incomingTheme);
+    setSubject(incomingSubject);
+    setDiscipline(incomingDiscipline);
+    setShowCover(false);
+    setExportNotice("Coordenadas recebidas do AcademiaOS. Revise-as e inicie a busca somente quando estiver pronto.");
+  }, []);
 
   const conceptMap = useMemo(
     () => new Map(atlas?.concepts.map((c) => [c.id, c]) || []),
@@ -512,19 +544,25 @@ export default function Home() {
     setTab(next);
     setQuery("");
   }
-  function exportRis() {
+  function exportBibliography(format: BibliographicFormat) {
     if (!atlas || !filteredWorks.length) return;
     const generatedAt = new Date().toISOString();
-    downloadRisExport({
+    const payload = {
       works: filteredWorks,
       query: atlas.query,
       coordinates: atlas.coordinates,
       generatedAt,
-    });
+    };
+    if (format === "bibtex") downloadBibtexExport(payload);
+    else if (format === "csv") downloadCsvExport(payload);
+    else downloadRisExport(payload);
+    const labels: Record<BibliographicFormat, string> = { ris: "RIS", bibtex: "BibTeX", csv: "CSV" };
     setExportNotice(
-      `Arquivo RIS com ${filteredWorks.length} registro${filteredWorks.length === 1 ? "" : "s"} gerado. A consulta e a proveniência foram incluídas nas notas de cada referência.`,
+      `Arquivo ${labels[format]} com ${filteredWorks.length} registro${filteredWorks.length === 1 ? "" : "s"} gerado. Consulta, coordenadas, fonte e data de exportação foram preservadas.`,
     );
   }
+
+  function exportRis() { exportBibliography("ris"); }
 
   if (showCover) return (
     <main className="reticula-cover">
@@ -752,6 +790,15 @@ export default function Home() {
             >
               Exportar RIS ({filteredWorks.length}) ↓
             </button>
+            <button className="export-format" onClick={() => exportBibliography("bibtex")} disabled={!filteredWorks.length} title="Exportar os registros atualmente filtrados em BibTeX">
+              BibTeX ↓
+            </button>
+            <button className="export-format" onClick={() => exportBibliography("csv")} disabled={!filteredWorks.length} title="Exportar os registros atualmente filtrados em CSV auditável">
+              CSV ↓
+            </button>
+            <a className="atlas-continue" href={cartographerSearchUrl(atlas)} target="_blank" rel="noreferrer" title="Abrir o Cartographer em uma nova aba com o contexto deste atlas">
+              Continuar no AcademiaOS ↗
+            </a>
             <button onClick={() => chooseTab("metodo")}>
               Método e proveniência
             </button>
@@ -957,9 +1004,12 @@ export default function Home() {
                   cada um rastreável.
                 </h2>
                 <p>DOI e página original preservados para conferência.</p>
-                <button className="export-ris export-ris-inline" onClick={exportRis} disabled={!filteredWorks.length}>
-                  Exportar estes {filteredWorks.length} registros em RIS ↓
-                </button>
+                <div className="export-inline-actions">
+                  <button className="export-ris export-ris-inline" onClick={exportRis} disabled={!filteredWorks.length}>RIS · {filteredWorks.length} registros ↓</button>
+                  <button className="export-format export-ris-inline" onClick={() => exportBibliography("bibtex")} disabled={!filteredWorks.length}>BibTeX ↓</button>
+                  <button className="export-format export-ris-inline" onClick={() => exportBibliography("csv")} disabled={!filteredWorks.length}>CSV ↓</button>
+                  <a className="atlas-continue export-ris-inline" href={cartographerSearchUrl(atlas)} target="_blank" rel="noreferrer">Continuar no AcademiaOS ↗</a>
+                </div>
               </div>
               <ol>
                 {filteredWorks.map((w, i) => (

@@ -13,6 +13,8 @@ Aplicação web que transforma três coordenadas — **tema central**, **assunto
 - tradução opcional das coordenadas de português para inglês;
 - fotos de autores obtidas da Wikipedia somente quando a correspondência é confiável;
 - transparência sobre proveniência, limites e indisponibilidade das fontes;
+- exportação do conjunto filtrado em RIS, BibTeX e CSV de auditoria;
+- continuidade explícita de descoberta com o AcademiaOS/Cartographer, sem sincronização automática;
 - interface responsiva em português.
 
 ## Pré-requisitos
@@ -109,6 +111,12 @@ worker/                entrada compatível com Cloudflare Workers
 8. Autores são conectados aos conceitos sustentados por suas obras no corpus.
 
 As relações representam **coocorrência documental**, não causalidade, consenso científico ou qualidade metodológica. Consulte sempre as fontes originais.
+
+## Interoperabilidade bibliográfica
+
+O Retícula exporta somente os trabalhos que permanecem no filtro ativo. **RIS** é a opção indicada para importadores bibliográficos; **BibTeX** atende fluxos LaTeX e gerenciadores compatíveis; **CSV** é um relatório de auditoria em UTF-8 com BOM, com colunas de proveniência. Em todos os formatos, o projeto preserva título, autores, ano, veículo, DOI, URL, resumo quando disponível, fonte, consulta, coordenadas e horário de exportação.
+
+Para continuar o levantamento no AcademiaOS, use a ação **Abrir no Cartographer** após gerar o atlas. Ela abre uma nova aba com a consulta e o contexto de origem preenchidos. O Retícula também aceita os parâmetros `theme`, `subject`, `discipline` e `from=academiaos` para preconfigurar o construtor quando o acesso partir do Cartographer. Nenhuma dessas ações dispara uma nova busca automaticamente: a execução permanece uma decisão explícita do pesquisador.
 
 ## Implantação
 
