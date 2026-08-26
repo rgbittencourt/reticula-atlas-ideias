@@ -125,22 +125,34 @@
 }
 .atlas-tools > a:hover,
 .atlas-continue:hover { color: #0e493e; text-decoration: underline; }
-.atlas-tools .export-ris,
-.export-ris-inline,
-.export-format {
+.atlas-tools .atlas-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--green);
   border-radius: 999px;
   padding: 7px 10px;
-  background: var(--green);
-  color: #fffdf7;
+  min-height: 31px;
+  background: #fffdf7;
+  color: var(--green);
   font: 9px DM Mono;
   letter-spacing: .3px;
   cursor: pointer;
+  text-decoration: none;
 }
-.atlas-tools .export-ris:hover,
+.atlas-tools .atlas-action:hover {
+  background: #edf3ee;
+  color: #0e493e;
+  text-decoration: none;
+}
+.atlas-tools .atlas-action-primary {
+  background: var(--green);
+  color: #fffdf7;
+}
+.atlas-tools .atlas-action-primary:hover,
 .export-ris-inline:hover,
 .export-format:hover { background: #0e493e; }
-.atlas-tools .export-ris:disabled,
+.atlas-tools .atlas-action:disabled,
 .export-ris-inline:disabled,
 .export-format:disabled { cursor: not-allowed; opacity: .5; }
 .export-notice {
@@ -154,7 +166,29 @@
 .export-ris-inline { margin-top: 14px; }
 .export-inline-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .export-inline-actions .export-ris-inline { margin-top: 0; }
-.export-inline-actions .atlas-continue { border: 1px solid var(--green); border-radius: 999px; padding: 7px 10px; }
+.export-inline-actions .atlas-continue-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 31px;
+  border: 1px solid var(--green);
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: #fffdf7;
+  color: var(--green);
+  font: 9px DM Mono;
+  letter-spacing: .3px;
+  text-decoration: none;
+}
+.export-inline-actions .atlas-continue-inline:hover {
+  background: #edf3ee;
+  color: #0e493e;
+  text-decoration: none;
+}
+.export-inline-actions .atlas-continue-inline:focus-visible {
+  outline: 2px solid var(--acid);
+  outline-offset: 2px;
+}
 .counts button {
   border: 0;
   background: none;

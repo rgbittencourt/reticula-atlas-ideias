@@ -783,20 +783,20 @@ export default function Home() {
               {atlas.works.length} obras
             </span>
             <button
-              className="export-ris"
+              className="atlas-action atlas-action-primary"
               onClick={exportRis}
               disabled={!filteredWorks.length}
-              title="Exportar os registros atualmente filtrados em formato RIS"
+              title="Exportar os registros atualmente filtrados em RIS"
             >
               Exportar RIS ({filteredWorks.length}) ↓
             </button>
-            <button className="export-format" onClick={() => exportBibliography("bibtex")} disabled={!filteredWorks.length} title="Exportar os registros atualmente filtrados em BibTeX">
-              BibTeX ↓
+            <button className="atlas-action" onClick={() => exportBibliography("bibtex")} disabled={!filteredWorks.length} title="Exportar os registros atualmente filtrados em BibTeX">
+              Exportar BibTeX ↓
             </button>
-            <button className="export-format" onClick={() => exportBibliography("csv")} disabled={!filteredWorks.length} title="Exportar os registros atualmente filtrados em CSV auditável">
-              CSV ↓
+            <button className="atlas-action" onClick={() => exportBibliography("csv")} disabled={!filteredWorks.length} title="Exportar os registros atualmente filtrados em CSV auditável">
+              Exportar CSV ↓
             </button>
-            <a className="atlas-continue" href={cartographerSearchUrl(atlas)} target="_blank" rel="noreferrer" title="Abrir o Cartographer em uma nova aba com o contexto deste atlas">
+            <a className="atlas-action atlas-continue" href={cartographerSearchUrl(atlas)} target="_blank" rel="noreferrer" title="Abrir o Cartographer em uma nova aba com o contexto deste atlas">
               Continuar no AcademiaOS ↗
             </a>
             <button onClick={() => chooseTab("metodo")}>
@@ -1008,7 +1008,17 @@ export default function Home() {
                   <button className="export-ris export-ris-inline" onClick={exportRis} disabled={!filteredWorks.length}>RIS · {filteredWorks.length} registros ↓</button>
                   <button className="export-format export-ris-inline" onClick={() => exportBibliography("bibtex")} disabled={!filteredWorks.length}>BibTeX ↓</button>
                   <button className="export-format export-ris-inline" onClick={() => exportBibliography("csv")} disabled={!filteredWorks.length}>CSV ↓</button>
-                  <a className="atlas-continue export-ris-inline" href={cartographerSearchUrl(atlas)} target="_blank" rel="noreferrer">Continuar no AcademiaOS ↗</a>
+                  <a
+                    className="atlas-continue atlas-continue-inline"
+                    href={cartographerSearchUrl(atlas)}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="Abrir o Cartographer em uma nova aba com o contexto deste atlas"
+                    aria-label="Continuar no AcademiaOS com o contexto deste atlas"
+                  >
+                    <span>Continuar no AcademiaOS</span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
                 </div>
               </div>
               <ol>
