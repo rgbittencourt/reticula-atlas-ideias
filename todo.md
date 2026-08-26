@@ -8,4 +8,4 @@
 - [x] Remover o botão “Continuar no AcademiaOS” do Retícula, pois a origem da pesquisa não é garantida.
 - [x] Padronizar o botão Exportar RIS com o mesmo estilo visual dos controles BibTeX e CSV.
 - [x] Exibir de forma consistente a quantidade de registros nos comandos RIS, BibTeX e CSV.
-- [ ] Cobrir, validar e publicar a revisão dos controles de exportação.
+- [x] Cobrir, validar e publicar a revisão dos controles de exportação.
