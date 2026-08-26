@@ -21,7 +21,7 @@ test("as exportações bibliográficas preservam dados, proveniência e formatos
   assert.match(ris, /downloadBibliographicExport/);
 });
 
-test("a interface exporta somente o conjunto filtrado e oferece continuidade contextual", () => {
+test("a interface exporta somente o conjunto filtrado sem presumir o retorno ao AcademiaOS", () => {
   assert.match(page, /downloadRisExport/);
   assert.match(page, /downloadBibtexExport/);
   assert.match(page, /downloadCsvExport/);
@@ -30,8 +30,7 @@ test("a interface exporta somente o conjunto filtrado e oferece continuidade con
   assert.match(page, /BibTeX/);
   assert.match(page, /CSV/);
   assert.match(page, /exportNotice/);
-  assert.match(page, /cartographerSearchUrl/);
   assert.match(page, /params\.get\("from"\) !== "academiaos"/);
-  assert.match(page, /Continuar no AcademiaOS/);
-  assert.match(page, /target="_blank"/);
+  assert.doesNotMatch(page, /cartographerSearchUrl/);
+  assert.doesNotMatch(page, /Continuar no AcademiaOS/);
 });

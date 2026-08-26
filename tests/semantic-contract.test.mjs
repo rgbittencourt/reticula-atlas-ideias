@@ -55,3 +55,12 @@ test("trata respostas HTTP vazias ou inválidas antes de construir o atlas", () 
   assert.match(page, /await readJsonResponse\(r, "construir o atlas"\)/);
   assert.match(page, /await readJsonResponse\(r, "traduzir as coordenadas"\)/);
 });
+
+test("padroniza os três formatos de exportação e não oferece retorno presumido ao AcademiaOS", () => {
+  assert.match(page, /Exportar RIS \(\{filteredWorks\.length\}\) ↓/);
+  assert.match(page, /Exportar BibTeX \(\{filteredWorks\.length\}\) ↓/);
+  assert.match(page, /Exportar CSV \(\{filteredWorks\.length\}\) ↓/);
+  assert.doesNotMatch(page, /Continuar no AcademiaOS/);
+  assert.doesNotMatch(page, /cartographerSearchUrl/);
+  assert.doesNotMatch(page, /atlas-action-primary/);
+});

@@ -87,7 +87,6 @@ const RETICULA_SERVICES = [
   "Repositórios BR · OAI-PMH",
 ] as const;
 
-const ACADEMIAOS_SEARCH_URL = "https://acadcarto-dbjwmxfb.manus.space/search";
 const contextValue = (value: string | null | undefined, maximum = 240) =>
   (value ?? "").replace(/[\u0000-\u001F\u007F]/g, " ").replace(/\s+/g, " ").trim().slice(0, maximum);
 
@@ -106,17 +105,6 @@ async function readJsonResponse(response: Response, operation: string) {
       `O serviço retornou uma resposta inválida ao ${operation}. Tente novamente em instantes.`,
     );
   }
-}
-
-function cartographerSearchUrl(atlas: Atlas) {
-  const params = new URLSearchParams({
-    query: contextValue(atlas.query),
-    source: "reticula",
-    theme: contextValue(atlas.coordinates.theme),
-    subject: contextValue(atlas.coordinates.subject),
-    discipline: contextValue(atlas.coordinates.discipline),
-  });
-  return `${ACADEMIAOS_SEARCH_URL}?${params.toString()}`;
 }
 
 const clean = (s: string) =>
@@ -800,7 +788,7 @@ export default function Home() {
               {atlas.works.length} obras
             </span>
             <button
-              className="atlas-action atlas-action-primary"
+              className="atlas-action"
               onClick={exportRis}
               disabled={!filteredWorks.length}
               title="Exportar os registros atualmente filtrados em RIS"
@@ -808,14 +796,11 @@ export default function Home() {
               Exportar RIS ({filteredWorks.length}) ↓
             </button>
             <button className="atlas-action" onClick={() => exportBibliography("bibtex")} disabled={!filteredWorks.length} title="Exportar os registros atualmente filtrados em BibTeX">
-              Exportar BibTeX ↓
+              Exportar BibTeX ({filteredWorks.length}) ↓
             </button>
             <button className="atlas-action" onClick={() => exportBibliography("csv")} disabled={!filteredWorks.length} title="Exportar os registros atualmente filtrados em CSV auditável">
-              Exportar CSV ↓
+              Exportar CSV ({filteredWorks.length}) ↓
             </button>
-            <a className="atlas-action atlas-continue" href={cartographerSearchUrl(atlas)} target="_blank" rel="noreferrer" title="Abrir o Cartographer em uma nova aba com o contexto deste atlas">
-              Continuar no AcademiaOS ↗
-            </a>
             <button onClick={() => chooseTab("metodo")}>
               Método e proveniência
             </button>
@@ -1022,20 +1007,9 @@ export default function Home() {
                 </h2>
                 <p>DOI e página original preservados para conferência.</p>
                 <div className="export-inline-actions">
-                  <button className="export-ris export-ris-inline" onClick={exportRis} disabled={!filteredWorks.length}>RIS · {filteredWorks.length} registros ↓</button>
-                  <button className="export-format export-ris-inline" onClick={() => exportBibliography("bibtex")} disabled={!filteredWorks.length}>BibTeX ↓</button>
-                  <button className="export-format export-ris-inline" onClick={() => exportBibliography("csv")} disabled={!filteredWorks.length}>CSV ↓</button>
-                  <a
-                    className="atlas-continue atlas-continue-inline"
-                    href={cartographerSearchUrl(atlas)}
-                    target="_blank"
-                    rel="noreferrer"
-                    title="Abrir o Cartographer em uma nova aba com o contexto deste atlas"
-                    aria-label="Continuar no AcademiaOS com o contexto deste atlas"
-                  >
-                    <span>Continuar no AcademiaOS</span>
-                    <span aria-hidden="true">↗</span>
-                  </a>
+                  <button className="export-format export-ris-inline" onClick={exportRis} disabled={!filteredWorks.length}>Exportar RIS ({filteredWorks.length}) ↓</button>
+                  <button className="export-format export-ris-inline" onClick={() => exportBibliography("bibtex")} disabled={!filteredWorks.length}>Exportar BibTeX ({filteredWorks.length}) ↓</button>
+                  <button className="export-format export-ris-inline" onClick={() => exportBibliography("csv")} disabled={!filteredWorks.length}>Exportar CSV ({filteredWorks.length}) ↓</button>
                 </div>
               </div>
               <ol>
