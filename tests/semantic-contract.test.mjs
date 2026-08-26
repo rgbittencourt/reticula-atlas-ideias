@@ -46,3 +46,12 @@ test("traduz as coordenadas com contexto científico e mantém contingência", (
   assert.match(translationRoute, /provider: "openai"/);
   assert.match(translationRoute, /provider: "public-fallback"/);
 });
+
+test("trata respostas HTTP vazias ou inválidas antes de construir o atlas", () => {
+  assert.match(page, /async function readJsonResponse\(response: Response, operation: string\)/);
+  assert.match(page, /const payload = await response\.text\(\)/);
+  assert.match(page, /O serviço não retornou dados ao \$\{operation\}/);
+  assert.match(page, /O serviço retornou uma resposta inválida ao \$\{operation\}/);
+  assert.match(page, /await readJsonResponse\(r, "construir o atlas"\)/);
+  assert.match(page, /await readJsonResponse\(r, "traduzir as coordenadas"\)/);
+});

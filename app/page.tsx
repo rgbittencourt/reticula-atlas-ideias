@@ -91,6 +91,23 @@ const ACADEMIAOS_SEARCH_URL = "https://acadcarto-dbjwmxfb.manus.space/search";
 const contextValue = (value: string | null | undefined, maximum = 240) =>
   (value ?? "").replace(/[\u0000-\u001F\u007F]/g, " ").replace(/\s+/g, " ").trim().slice(0, maximum);
 
+async function readJsonResponse(response: Response, operation: string) {
+  const payload = await response.text();
+  if (!payload.trim()) {
+    const status = response.status ? ` (HTTP ${response.status})` : "";
+    throw new Error(
+      `O serviço não retornou dados ao ${operation}${status}. Tente novamente em instantes.`,
+    );
+  }
+  try {
+    return JSON.parse(payload);
+  } catch {
+    throw new Error(
+      `O serviço retornou uma resposta inválida ao ${operation}. Tente novamente em instantes.`,
+    );
+  }
+}
+
 function cartographerSearchUrl(atlas: Atlas) {
   const params = new URLSearchParams({
     query: contextValue(atlas.query),
@@ -493,7 +510,7 @@ export default function Home() {
     try {
       const p = new URLSearchParams({ theme, subject, discipline });
       const r = await fetch(`/api/atlas?${p}`, { signal: controller.signal });
-      const d = await r.json();
+      const d = await readJsonResponse(r, "construir o atlas");
       if (!r.ok)
         throw new Error(d.error || "A pesquisa não pôde ser concluída.");
       setAtlas(d);
@@ -522,7 +539,7 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ theme, subject, discipline }),
       });
-      const d = await r.json();
+      const d = await readJsonResponse(r, "traduzir as coordenadas");
       if (!r.ok) throw new Error(d.error || "A tradução não pôde ser concluída.");
       setTheme(d.theme);
       setSubject(d.subject);
